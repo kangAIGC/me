@@ -22,14 +22,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
+
+      # 用 Node 内置 corepack 管理 pnpm（读取 package.json 的 packageManager 字段）
+      - name: Enable pnpm via corepack
+        run: corepack enable
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
