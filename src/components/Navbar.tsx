@@ -9,8 +9,10 @@ const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 
 export function Navbar() {
   const pathname = usePathname();
+  // 归一化：去掉末尾 '/' 再比较，兼容 /prd 与 /prd/ 两种情况
+  const normalized = pathname?.replace(/\/+$/, '') ?? '';
   const [activeTab, setActiveTab] = useState<'demo' | 'prd' | 'resume'>(
-    pathname === '/prd' ? 'prd' : pathname === '/resume' ? 'resume' : 'demo'
+    normalized === '/prd' ? 'prd' : normalized === '/resume' ? 'resume' : 'demo'
   );
 
   return (

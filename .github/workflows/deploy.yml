@@ -39,6 +39,24 @@ jobs:
           # 部署在 https://<user>.github.io/<repo>/ 子路径下
           NEXT_PUBLIC_BASE_PATH: /showcase
 
+      # GitHub Pages 只在 URL 带 trailing slash 时匹配 <route>/index.html；
+      # 用户手动输入 /prd（无/）会直接 404。这里复制一份 <route>.html 单文件兜底。
+      - name: Create non-trailing-slash HTML fallbacks
+        working-directory: out
+        run: |
+          shopt -s nullglob
+          for dir in */; do
+            name="${dir%/}"
+            # 跳过 Next.js 内部目录和资源目录
+            case "$name" in
+              _next|assets|images|favicon.ico|404) continue ;;
+            esac
+            if [ -f "$name/index.html" ]; then
+              cp "$name/index.html" "$name.html"
+              echo "Fallback: $name/index.html → $name.html"
+            fi
+          done
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
   output: 'export',
   basePath: BASE_PATH,
   assetPrefix: BASE_PATH,
+  // 链接自动带 trailing slash，对齐 GitHub Pages <route>/index.html 目录结构
+  trailingSlash: true,
   // 静态导出无法使用 Next.js 图片优化，禁用
   images: {
     unoptimized: true,
