@@ -13,10 +13,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  // 部署构建跳过 lint 和类型检查（避免阻断部署；代码质量在本地/PR 保证）
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // 部署构建跳过类型检查（避免阻断部署；代码质量在本地/PR 保证）
   typescript: {
     ignoreBuildErrors: true,
   },

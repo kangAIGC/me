@@ -1,6 +1,9 @@
 import { MetadataRoute } from 'next';
 
-export default function robots(): MetadataRoute.Robots {
+// output: export 模式下，metadata route 需显式声明为静态
+export const dynamic = "force-static";
+
+export default function robot(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: '*',
