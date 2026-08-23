@@ -7,7 +7,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 
 const VIDEOS = {
   'Agora.ai': 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91.mp4',
-  KnowFlow: 'https://demovideo.tos-cn-shanghai.volces.com/demo-ASA.mp4',
+  KnowFlow: 'https://demovideo.tos-cn-shanghai.volces.com/%E8%A7%86%E9%A2%91.mp4',
   ArchDA: 'https://demovideo.tos-cn-shanghai.volces.com/demo.mp4',
 };
 
@@ -93,11 +93,14 @@ export function DemoPage() {
               </a>
             )}
             {activeProduct === 'KnowFlow' && (
-              <button
-                className="w-full rounded px-4 py-2 text-sm font-bold bg-[#333333] text-white hover:bg-[#444444] transition-colors shadow-md"
+              <a
+                href="https://kangaigc.github.io/KnowFlow/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full rounded px-4 py-2 text-sm font-bold bg-[#333333] text-white hover:bg-[#444444] transition-colors shadow-md text-center inline-block"
               >
                 点击试用
-              </button>
+              </a>
             )}
           </div>
           <div className="flex-1" />
