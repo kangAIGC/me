@@ -13,7 +13,7 @@ const VIDEOS = {
 
 const THUMBNAILS = {
   'Agora.ai': `${BASE}/agora封面.png`,
-  KnowFlow: 'https://demovideo.tos-cn-shanghai.volces.com/prd_ASA_img/ASA-p1.png',
+  KnowFlow: `${BASE}/封面.png`,
   ArchDA: `${BASE}/ArchDA封面.png`,
 };
 
