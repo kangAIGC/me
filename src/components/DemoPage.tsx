@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 
+// 静态导出时由 basePath 注入子路径前缀（GitHub Pages 部署在 /<repo>/ 下）
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+
 const VIDEOS = {
   'Agora.ai': 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91.mp4',
   KnowFlow: 'https://demovideo.tos-cn-shanghai.volces.com/demo-ASA.mp4',
@@ -9,9 +12,9 @@ const VIDEOS = {
 };
 
 const THUMBNAILS = {
-  'Agora.ai': '/agora封面.png',
+  'Agora.ai': `${BASE}/agora封面.png`,
   KnowFlow: 'https://demovideo.tos-cn-shanghai.volces.com/prd_ASA_img/ASA-p1.png',
-  ArchDA: '/ArchDA封面.png',
+  ArchDA: `${BASE}/ArchDA封面.png`,
 };
 
 export function DemoPage() {

@@ -4,6 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+// 静态导出时由 basePath 注入子路径前缀（GitHub Pages 部署在 /<repo>/ 下）
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+
 export function Navbar() {
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState<'demo' | 'prd' | 'resume'>(
@@ -14,7 +17,7 @@ export function Navbar() {
     <nav className="sticky top-0 z-50 w-full border-b border-[#E5E5E5] bg-white">
       <div className="mx-auto flex h-12 max-w-7xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
-          <img src="/1.jpg" alt="KangAigc" className="h-8 w-8 rounded-full object-cover" />
+          <img src={`${BASE}/1.jpg`} alt="KangAigc" className="h-8 w-8 rounded-full object-cover" />
           <div className="flex flex-col leading-tight">
             <span className="text-base font-bold text-[#1A1A1A]">Wenkang Xu</span>
             <span className="text-xs text-[#666666]">kangAIGC</span>
