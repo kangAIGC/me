@@ -1,0 +1,17 @@
+# Railway 部署配置
+# 文档: https://nixpacks.com/docs/configuration
+
+# 依赖安装阶段（执行一次，避免 build.sh 内重复 install）
+[phases.install]
+cmds = ["pnpm install --frozen-lockfile"]
+
+# 构建阶段：Next.js 构建 + 自定义 server 打包
+[phases.build]
+cmds = [
+  "pnpm next build",
+  "pnpm tsup src/server.ts --format cjs --platform node --target node20 --outDir dist --no-splitting --no-minify",
+]
+
+# 启动阶段：直接运行 server（server.ts 读取 process.env.PORT，Railway 会注入该变量）
+[start]
+cmd = "node dist/server.js"
