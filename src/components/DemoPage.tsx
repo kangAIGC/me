@@ -16,10 +16,10 @@ const PRODUCT_VIDEOS = {
   KnowFlow: 'https://demovideo.tos-cn-shanghai.volces.com/%E8%A7%86%E9%A2%91.mp4',
 };
 
-// Agora.ai 按版本区分封面（V1.0 用 ArchDA封面.png）
+// Agora.ai 按版本区分封面（V2.0 用 ADA封面.png，V1.0 用 ArchDA封面.png）
 const AGORA_THUMBNAILS = {
   'V3.0': `${BASE}/agora封面.png`,
-  'V2.0': `${BASE}/agora封面.png`,
+  'V2.0': `${BASE}/ADA封面.png`,
   'V1.0': `${BASE}/ArchDA封面.png`,
 };
 
