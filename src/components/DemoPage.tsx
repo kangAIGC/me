@@ -5,8 +5,14 @@ import { useState } from 'react';
 // 静态导出时由 basePath 注入子路径前缀（GitHub Pages 部署在 /<repo>/ 下）
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 
-const VIDEOS = {
-  'Agora.ai': 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91.mp4',
+// Agora.ai 按版本区分视频（V2.0 / V1.0 暂与 V3.0 一致，待补充专属视频链接）
+const AGORA_VIDEOS = {
+  'V3.0': 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91.mp4',
+  'V2.0': 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91.mp4',
+  'V1.0': 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91.mp4',
+};
+
+const PRODUCT_VIDEOS = {
   KnowFlow: 'https://demovideo.tos-cn-shanghai.volces.com/%E8%A7%86%E9%A2%91.mp4',
 };
 
@@ -17,6 +23,9 @@ const THUMBNAILS = {
 
 export function DemoPage() {
   const [activeProduct, setActiveProduct] = useState<'Agora.ai' | 'KnowFlow'>('Agora.ai');
+  const [agoraVersion, setAgoraVersion] = useState<'V3.0' | 'V2.0' | 'V1.0'>('V3.0');
+
+  const videoSrc = activeProduct === 'Agora.ai' ? AGORA_VIDEOS[agoraVersion] : PRODUCT_VIDEOS.KnowFlow;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -46,13 +55,32 @@ export function DemoPage() {
           </button>
         </div>
 
+        {/* Agora.ai 版本切换按钮 */}
+        {activeProduct === 'Agora.ai' && (
+          <div className="shrink-0 flex items-center justify-center gap-2 pb-1 w-full">
+            {(['V3.0', 'V2.0', 'V1.0'] as const).map((v) => (
+              <button
+                key={v}
+                onClick={() => setAgoraVersion(v)}
+                className={`min-w-[72px] rounded px-3 py-1 text-xs font-medium transition-all ${
+                  agoraVersion === v
+                    ? 'bg-[#333333] text-white shadow-sm'
+                    : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F5F5F5]'
+                }`}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Video Display Area */}
         <div className="flex-1 flex items-center justify-center py-2 w-full">
           <div className="w-full">
             <div className="relative w-full aspect-video overflow-hidden rounded-lg bg-[#F5F5F5]" style={{ minHeight: '350px' }}>
               <video
-                key={activeProduct}
-                src={VIDEOS[activeProduct]}
+                key={`${activeProduct}-${activeProduct === 'Agora.ai' ? agoraVersion : ''}`}
+                src={videoSrc}
                 poster={THUMBNAILS[activeProduct]}
                 controls
                 controlsList="nodownload"
