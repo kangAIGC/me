@@ -55,22 +55,26 @@ export function DemoPage() {
           </button>
         </div>
 
-        {/* Agora.ai 版本切换按钮 */}
+        {/* Agora.ai 版本切换按钮（与 Agora.ai 按钮等宽，上下对齐） */}
         {activeProduct === 'Agora.ai' && (
-          <div className="shrink-0 flex items-center justify-center gap-2 pb-1 w-full">
-            {(['V3.0', 'V2.0', 'V1.0'] as const).map((v) => (
-              <button
-                key={v}
-                onClick={() => setAgoraVersion(v)}
-                className={`min-w-[72px] rounded px-3 py-1 text-xs font-medium transition-all ${
-                  agoraVersion === v
-                    ? 'bg-[#333333] text-white shadow-sm'
-                    : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F5F5F5]'
-                }`}
-              >
-                {v}
-              </button>
-            ))}
+          <div className="shrink-0 flex gap-2 pb-1 w-full">
+            <div className="flex-1 flex gap-2">
+              {(['V3.0', 'V2.0', 'V1.0'] as const).map((v) => (
+                <button
+                  key={v}
+                  onClick={() => setAgoraVersion(v)}
+                  className={`flex-1 rounded px-3 py-1 text-xs font-medium transition-all ${
+                    agoraVersion === v
+                      ? 'bg-[#333333] text-white shadow-sm'
+                      : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F5F5F5]'
+                  }`}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
+            {/* 右侧占位，与 KnowFlow 按钮位置对称 */}
+            <div className="flex-1" />
           </div>
         )}
 
