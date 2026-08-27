@@ -8,17 +8,15 @@ const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 const VIDEOS = {
   'Agora.ai': 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91.mp4',
   KnowFlow: 'https://demovideo.tos-cn-shanghai.volces.com/%E8%A7%86%E9%A2%91.mp4',
-  ArchDA: 'https://demovideo.tos-cn-shanghai.volces.com/demo.mp4',
 };
 
 const THUMBNAILS = {
   'Agora.ai': `${BASE}/agora封面.png`,
   KnowFlow: `${BASE}/封面.png`,
-  ArchDA: `${BASE}/ArchDA封面.png`,
 };
 
 export function DemoPage() {
-  const [activeProduct, setActiveProduct] = useState<'Agora.ai' | 'KnowFlow' | 'ArchDA'>('Agora.ai');
+  const [activeProduct, setActiveProduct] = useState<'Agora.ai' | 'KnowFlow'>('Agora.ai');
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -45,16 +43,6 @@ export function DemoPage() {
             }`}
           >
             KnowFlow
-          </button>
-          <button
-            onClick={() => setActiveProduct('ArchDA')}
-            className={`flex-1 rounded px-4 py-2 text-sm font-medium transition-all ${
-              activeProduct === 'ArchDA'
-                ? 'bg-[#333333] text-white shadow-md'
-                : 'bg-white text-[#1A1A1A] border border-[#E5E5E5] hover:bg-[#F5F5F5]'
-            }`}
-          >
-            ArchDA
           </button>
         </div>
 

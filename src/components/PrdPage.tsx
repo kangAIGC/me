@@ -206,7 +206,7 @@ function PrdContent({
 }
 
 export function PrdPage() {
-  const [activeProduct, setActiveProduct] = useState<'Agora.ai' | 'KnowFlow' | 'ArchDA'>('Agora.ai');
+  const [activeProduct, setActiveProduct] = useState<'Agora.ai' | 'KnowFlow'>('Agora.ai');
   const [activeSectionId, setActiveSectionId] = useState('ada-1-1');
 
   const toc = activeProduct === 'Agora.ai' ? ADA_TOC : ASA_TOC;
@@ -250,19 +250,6 @@ export function PrdPage() {
         >
           KnowFlow
         </button>
-        <button
-          onClick={() => {
-            setActiveProduct('ArchDA');
-            setActiveSectionId('archda-1-1');
-          }}
-          className={`flex-1 rounded px-4 py-2 text-sm font-medium transition-all ${
-            activeProduct === 'ArchDA'
-              ? 'bg-[#333333] text-white shadow-md'
-              : 'bg-white text-[#1A1A1A] border border-[#E5E5E5] hover:bg-[#F5F5F5]'
-          }`}
-        >
-          ArchDA
-        </button>
       </div>
 
       {/* Main Content - Feishu Document Embed (Centered with max width) */}
@@ -275,9 +262,7 @@ export function PrdPage() {
               src={
                 activeProduct === 'Agora.ai'
                   ? 'https://vcnxjdphn663.feishu.cn/wiki/KscPwvr2ziA5HlkMicjcqWjcnKg'
-                  : activeProduct === 'KnowFlow'
-                  ? 'https://vcnxjdphn663.feishu.cn/wiki/KUi4wMcoTi2zNRk4L55cn7HWngb'
-                  : 'https://vcnxjdphn663.feishu.cn/wiki/ATVBwBMaci46thkQH9PcRnzxnLg'
+                  : 'https://vcnxjdphn663.feishu.cn/wiki/KUi4wMcoTi2zNRk4L55cn7HWngb'
               }
               className="border-0"
               style={{ width: '100%', height: 'calc(100% + 56px)' }}
