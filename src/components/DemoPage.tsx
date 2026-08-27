@@ -32,6 +32,7 @@ export function DemoPage() {
   const [agoraVersion, setAgoraVersion] = useState<'V3.0' | 'V2.0' | 'V1.0'>('V3.0');
 
   const videoSrc = activeProduct === 'Agora.ai' ? AGORA_VIDEOS[agoraVersion] : PRODUCT_VIDEOS.KnowFlow;
+  const poster = activeProduct === 'Agora.ai' ? AGORA_THUMBNAILS[agoraVersion] : PRODUCT_THUMBNAILS.KnowFlow;
 
   return (
     <div className="flex flex-col min-h-screen">
