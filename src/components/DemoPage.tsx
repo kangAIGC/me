@@ -5,11 +5,11 @@ import { useState } from 'react';
 // 静态导出时由 basePath 注入子路径前缀（GitHub Pages 部署在 /<repo>/ 下）
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 
-// Agora.ai 按版本区分视频（V2.0 / V1.0 暂与 V3.0 一致，待补充专属视频链接）
+// Agora.ai 按版本区分视频
 const AGORA_VIDEOS = {
   'V3.0': 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91.mp4',
-  'V2.0': 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91.mp4',
-  'V1.0': 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91.mp4',
+  'V2.0': 'https://demovideo.tos-cn-shanghai.volces.com/demo-ADA(%E5%8E%8B%E7%BC%A9%EF%BC%89.mp4',
+  'V1.0': 'https://demovideo.tos-cn-shanghai.volces.com/demo.mp4',
 };
 
 const PRODUCT_VIDEOS = {
