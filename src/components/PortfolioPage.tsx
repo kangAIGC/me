@@ -11,8 +11,7 @@ const PAGE_PAD_Y = 16; // 外层垂直 padding (px)，旧 py-6 (=24) → 16 收�
 const STRIP_TO_WATERFALL_MB = 1; // 2×2 视频带与图片瀑布流之间的间距 (px)，旧 mb-2 (=8) → 1
 
 const BREAKPOINTS: { minWidth: number; columns: number }[] = [
-  { minWidth: 1280, columns: 5 },
-  { minWidth: 1024, columns: 4 },
+  { minWidth: 1024, columns: 4 }, // 桌面/大屏统一 4 列（原 ≥1280 为 5 列，已取消）
   { minWidth: 768, columns: 3 },
   { minWidth: 480, columns: 2 },
   { minWidth: 0, columns: 1 },
