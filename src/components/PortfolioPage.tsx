@@ -5,7 +5,11 @@ import { useEffect, useMemo, useState } from 'react';
 /** GitHub Pages 子路径前缀（静态导出时注入） */
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 
-const GUTTER = 8; // 分隔缝：对齐即梦平台作品卡的紧凑感（旧值 16 → 新值 8px），列间/列内卡片间严格统一
+const GUTTER = 5; // 作品分隔缝（列间/列内卡片间全局统一），旧 16 → 8 → 5，更紧凑但仍保留区分度
+const PAGE_PAD_X = 12; // 外层水平 padding (px)，旧 px-4 (=16) → 12 收缩
+const PAGE_PAD_Y = 16; // 外层垂直 padding (px)，旧 py-6 (=24) → 16 收缩
+const STRIP_TO_WATERFALL_MB = 1; // 2×2 视频带与图片瀑布流之间的间距 (px)，旧 mb-2 (=8) → 1
+
 const BREAKPOINTS: { minWidth: number; columns: number }[] = [
   { minWidth: 1280, columns: 5 },
   { minWidth: 1024, columns: 4 },
@@ -17,11 +21,14 @@ const BREAKPOINTS: { minWidth: number; columns: number }[] = [
 const MAX_H = 600;
 const MIN_H = 200;
 
+/** 全站统一的项目分类（电商领域 · 带货视频）。作用：分类标签 / 项目属性 / 详情描述。 */
+const SITE_CATEGORY_LABEL = '电商领域 · 带货视频';
+
 type CatKey = 'manju' | 'ecom' | 'arch';
 const CAT_LABEL: Record<CatKey, string> = {
-  manju: '漫剧',
-  ecom: '电商',
-  arch: '建筑',
+  manju: SITE_CATEGORY_LABEL,
+  ecom: SITE_CATEGORY_LABEL,
+  arch: SITE_CATEGORY_LABEL,
 };
 
 interface MediaItem {
@@ -37,6 +44,17 @@ interface MediaItem {
   poster?: string;
 }
 
+/** 把"原始文件的描述"重写为电商语境的带货视频描述（作为兜底统一用文案，不同文件名给出略微差异化的描述避免重复） */
+function formatEcomDescription(title: string, folderHint: CatKey) {
+  // 统一为电商·带货视频领域描述，避免原"漫剧场景概念"等非电商描述残留
+  const subjects: Record<CatKey, string> = {
+    manju: '国风主题短视频',
+    ecom: '产品主图短视频',
+    arch: '空间氛围短视频',
+  };
+  return `电商领域·带货视频：${subjects[folderHint]}《${title}》。面向商品落地页 / 信息流投放 / 详情页头图场景，突出卖点、情绪与转化节奏。`;
+}
+
 /** 瀑布流中：按列宽与 ratio 计算卡片高度(px)，夹到 [MIN_H, MAX_H] */
 function clampedHeight(ratio: number, colWidth: number) {
   const raw = ratio > 0 ? colWidth / ratio : colWidth * (4 / 3);
@@ -46,54 +64,54 @@ function clampedHeight(ratio: number, colWidth: number) {
 /* ---------- 数据源（34 项：30 图 + 4 视频） ---------- */
 
 const IMAGE_ITEMS: MediaItem[] = [
-  // 漫剧(8)
+  // 漫剧(8) → 统一为"电商领域 · 带货视频"分类与描述
   ...[
-    ['青云大殿.png', '青云大殿', '漫剧场景概念：仙山宫殿。'],
-    ['诛仙台.png', '诛仙台', '漫剧关键场景：诛仙祭台。'],
-    ['萧珩.png', '萧珩', '男主角·萧珩 立绘。'],
-    ['苏挽.png', '苏挽', '女主角·苏挽 立绘。'],
-    ['墨断剑红绳.png', '墨断剑与红绳', '关键道具概念。'],
-    ['灭门旧夜.png', '灭门旧夜', '雨夜的灭门回忆场景。'],
-    ['玄青上人.png', '玄青上人', '配角·玄青上人 立绘。'],
-    ['墨玉牌.png', '墨玉牌', '主线信物·墨玉牌设定图。'],
-  ].map<MediaItem>(([file, title, description]) => ({
+    ['青云大殿.png', '青云大殿'],
+    ['诛仙台.png', '诛仙台'],
+    ['萧珩.png', '萧珩'],
+    ['苏挽.png', '苏挽'],
+    ['墨断剑红绳.png', '墨断剑与红绳'],
+    ['灭门旧夜.png', '灭门旧夜'],
+    ['玄青上人.png', '玄青上人'],
+    ['墨玉牌.png', '墨玉牌'],
+  ].map<MediaItem>(([file, title]) => ({
     id: `manju-img-${file}`,
     kind: 'image',
     category: 'manju',
-    categoryLabel: CAT_LABEL.manju,
+    categoryLabel: SITE_CATEGORY_LABEL,
     title,
-    description,
+    description: formatEcomDescription(title, 'manju'),
     src: `${BASE}/漫剧/${encodeURIComponent(file)}`,
   })),
 
-  // 电商(6)
+  // 电商(6) → 统一为"电商领域 · 带货视频"分类与描述
   ...Array.from({ length: 6 }, (_, i) => i + 1).map<MediaItem>((n) => ({
     id: `ecom-img-${n}`,
     kind: 'image',
     category: 'ecom',
-    categoryLabel: CAT_LABEL.ecom,
+    categoryLabel: SITE_CATEGORY_LABEL,
     title: `电商作品 ${n}`,
-    description: '电商视觉与详情页设计。',
+    description: formatEcomDescription(`电商作品 ${n}`, 'ecom'),
     src: `${BASE}/电商/${n}.png`,
   })),
 
-  // 建筑(16): 1-8 png, 9-16 jpeg
+  // 建筑(16): 1-8 png, 9-16 jpeg → 统一为"电商领域 · 带货视频"分类与描述
   ...Array.from({ length: 8 }, (_, i) => i + 1).map<MediaItem>((n) => ({
     id: `arch-img-${n}-png`,
     kind: 'image',
     category: 'arch',
-    categoryLabel: CAT_LABEL.arch,
+    categoryLabel: SITE_CATEGORY_LABEL,
     title: `建筑作品 ${n}`,
-    description: '建筑概念渲染。',
+    description: formatEcomDescription(`建筑作品 ${n}`, 'arch'),
     src: `${BASE}/建筑/${n}.png`,
   })),
   ...Array.from({ length: 8 }, (_, i) => i + 9).map<MediaItem>((n) => ({
     id: `arch-img-${n}-jpeg`,
     kind: 'image',
     category: 'arch',
-    categoryLabel: CAT_LABEL.arch,
+    categoryLabel: SITE_CATEGORY_LABEL,
     title: `建筑作品 ${n}`,
-    description: '建筑概念渲染。',
+    description: formatEcomDescription(`建筑作品 ${n}`, 'arch'),
     src: `${BASE}/建筑/${n}.jpeg`,
   })),
 ];
@@ -103,9 +121,9 @@ const VIDEO_ITEMS: MediaItem[] = [
     id: 'v-manju-chengpin',
     kind: 'video',
     category: 'manju',
-    categoryLabel: CAT_LABEL.manju,
+    categoryLabel: SITE_CATEGORY_LABEL,
     title: '漫剧成片',
-    description: '漫剧正片剪辑演示。',
+    description: formatEcomDescription('漫剧成片', 'manju'),
     src: 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%AB%E5%89%A7%E6%88%90%E5%93%81.mp4',
     poster: `${BASE}/漫剧/${encodeURIComponent('青云大殿.png')}`,
     ratio: 16 / 9,
@@ -114,9 +132,9 @@ const VIDEO_ITEMS: MediaItem[] = [
     id: 'v-manju-tour-1',
     kind: 'video',
     category: 'manju',
-    categoryLabel: CAT_LABEL.manju,
+    categoryLabel: SITE_CATEGORY_LABEL,
     title: '漫游视频 1',
-    description: '第一视角漫游展示（一）。',
+    description: formatEcomDescription('漫游视频 1', 'manju'),
     src: 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%AB%E6%B8%B8%E8%A7%86%E9%A2%911.mp4',
     poster: `${BASE}/漫剧/${encodeURIComponent('诛仙台.png')}`,
     ratio: 16 / 9,
@@ -125,9 +143,9 @@ const VIDEO_ITEMS: MediaItem[] = [
     id: 'v-manju-tour-2',
     kind: 'video',
     category: 'manju',
-    categoryLabel: CAT_LABEL.manju,
+    categoryLabel: SITE_CATEGORY_LABEL,
     title: '漫游视频 2',
-    description: '第一视角漫游展示（二）。',
+    description: formatEcomDescription('漫游视频 2', 'manju'),
     src: 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%AB%E6%B8%B8%E8%A7%86%E9%A2%912.mp4',
     poster: `${BASE}/漫剧/${encodeURIComponent('墨玉牌.png')}`,
     ratio: 16 / 9,
@@ -136,9 +154,9 @@ const VIDEO_ITEMS: MediaItem[] = [
     id: 'v-arch-1',
     kind: 'video',
     category: 'arch',
-    categoryLabel: CAT_LABEL.arch,
+    categoryLabel: SITE_CATEGORY_LABEL,
     title: '建筑动画 1',
-    description: '建筑空间漫游动画演示。',
+    description: formatEcomDescription('建筑动画 1', 'arch'),
     src: 'https://demovideo.tos-cn-shanghai.volces.com/1.mp4',
     poster: `${BASE}/建筑/1.png`,
     ratio: 16 / 9,
@@ -333,11 +351,14 @@ export function PortfolioPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-6">
+    <div
+      className="mx-auto w-full max-w-7xl"
+      style={{ paddingTop: PAGE_PAD_Y, paddingBottom: PAGE_PAD_Y, paddingLeft: PAGE_PAD_X, paddingRight: PAGE_PAD_X }}
+    >
       {/* ======= 顶部 2×2 视频区（最前端 · 外层样式与图片卡统一） ======= */}
       <section
         aria-label="特色视频"
-        className="mb-2"
+        style={{ marginBottom: STRIP_TO_WATERFALL_MB }}
       >
         <div
           className="grid w-full"
@@ -359,7 +380,7 @@ export function PortfolioPage() {
                 }
               }}
               // 视频卡外层与图片卡完全一致：圆角 1px 浅灰边、白底、hover 统一效果（去掉之前的黑粗边 / 黑底）
-              className="group relative w-full cursor-pointer overflow-hidden rounded-md border border-[#EFEFEF] bg-white transition-all duration-300 ease-out hover:shadow-lg hover:-translate-y-0.5"
+              className="group relative w-full cursor-pointer overflow-hidden rounded-md border border-[#F1F1F1] bg-white transition-all duration-300 ease-out hover:shadow-[0_4px_18px_rgba(0,0,0,0.06)] hover:-translate-y-[1px]"
               style={{ aspectRatio: (v.ratio ?? 16 / 9).toString(), maxHeight: MAX_H, minHeight: MIN_H }}
             >
               <video
@@ -508,8 +529,8 @@ function Card({
         }
       }}
       className={[
-        'group relative w-full cursor-pointer overflow-hidden rounded-md border border-[#EFEFEF] bg-white',
-        'transition-all duration-300 ease-out hover:shadow-lg hover:-translate-y-0.5',
+        'group relative w-full cursor-pointer overflow-hidden rounded-md border border-[#F1F1F1] bg-white',
+        'transition-all duration-300 ease-out hover:shadow-[0_4px_18px_rgba(0,0,0,0.06)] hover:-translate-y-[1px]',
         shown ? 'opacity-100' : 'opacity-0 animate-fadeInCard',
       ].join(' ')}
       style={{
