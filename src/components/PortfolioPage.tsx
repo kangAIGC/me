@@ -111,8 +111,8 @@ const VIDEO_ITEMS: MediaItem[] = [
     categoryLabel: VIDEO_LABEL,
     title: '漫剧成片',
     description: '漫剧成片',
+    // 封面修复：不再使用外部静态图 poster（此前与视频内容不符），直接展示视频首帧
     src: 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%AB%E5%89%A7%E6%88%90%E5%93%81.mp4',
-    poster: `${BASE}/漫剧/${encodeURIComponent('青云大殿.png')}`,
     ratio: 16 / 9,
   },
   {
@@ -123,7 +123,6 @@ const VIDEO_ITEMS: MediaItem[] = [
     title: '漫游视频 1',
     description: '漫游视频 1',
     src: 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%AB%E6%B8%B8%E8%A7%86%E9%A2%911.mp4',
-    poster: `${BASE}/漫剧/${encodeURIComponent('诛仙台.png')}`,
     ratio: 16 / 9,
   },
   {
@@ -134,7 +133,6 @@ const VIDEO_ITEMS: MediaItem[] = [
     title: '漫游视频 2',
     description: '漫游视频 2',
     src: 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%AB%E6%B8%B8%E8%A7%86%E9%A2%912.mp4',
-    poster: `${BASE}/漫剧/${encodeURIComponent('墨玉牌.png')}`,
     ratio: 16 / 9,
   },
   {
@@ -145,7 +143,6 @@ const VIDEO_ITEMS: MediaItem[] = [
     title: '建筑动画 1',
     description: '建筑动画 1',
     src: 'https://demovideo.tos-cn-shanghai.volces.com/1.mp4',
-    poster: `${BASE}/建筑/1.png`,
     ratio: 16 / 9,
   },
 ];
@@ -372,7 +369,6 @@ export function PortfolioPage() {
             >
               <video
                 src={v.src}
-                poster={v.poster}
                 preload="auto"
                 autoPlay
                 loop
@@ -388,11 +384,6 @@ export function PortfolioPage() {
                   setTimeout(() => el.removeAttribute('data-waiting'), 300);
                 }}
                 className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-                style={{
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  backgroundImage: v.poster ? `url(${v.poster})` : undefined,
-                }}
               />
 
               {/* 下方信息条（分类 + 标题）与图片卡的遮罩风格一致 */}
