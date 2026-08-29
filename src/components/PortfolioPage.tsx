@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 /** GitHub Pages 子路径前缀（静态导出时注入） */
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 
-const GUTTER = 16; // 间距 px，全局严格统一
+const GUTTER = 8; // 分隔缝：对齐即梦平台作品卡的紧凑感（旧值 16 → 新值 8px），列间/列内卡片间严格统一
 const BREAKPOINTS: { minWidth: number; columns: number }[] = [
   { minWidth: 1280, columns: 5 },
   { minWidth: 1024, columns: 4 },
