@@ -26,8 +26,8 @@ const CATEGORY_CONTENT: Record<PortfolioCategory, CategoryContent> = {
       src: `${BASE}/漫剧/html.html`,
     },
     grid: [
-      // 第 1 行左：视频（目录内暂无视频，留占位；待补充视频链接后替换 src）
-      { kind: 'video', src: '' },
+      // 第 1 行左：漫剧演示视频
+      { kind: 'video', src: 'https://demovideo.tos-cn-shanghai.volces.com/mock-manju/video.mp4' },
       // 第 1 行右：图片
       { kind: 'image', src: `${BASE}/漫剧/青云大殿.png`, alt: '青云大殿' },
       // 第 2 行左
