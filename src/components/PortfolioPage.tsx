@@ -14,97 +14,249 @@ const BREAKPOINTS: { minWidth: number; columns: number }[] = [
   { minWidth: 0, columns: 1 },
 ];
 
-type Category = 'all' | 'manju' | 'ecom' | 'arch';
+const MAX_H = 600;
+const MIN_H = 200;
+
+type CatKey = 'manju' | 'ecom' | 'arch';
+const CAT_LABEL: Record<CatKey, string> = {
+  manju: '漫剧',
+  ecom: '电商',
+  arch: '建筑',
+};
 
 interface MediaItem {
   id: string;
   kind: 'image' | 'video';
-  category: Exclude<Category, 'all'>;
+  category: CatKey;
   categoryLabel: string;
   title: string;
   description: string;
-  /** 原始比例（宽/高），用于瀑布流渲染占位，避免初始布局塌陷 */
+  /** 已知时可直接给出（宽/高），否则加载后补齐 */
   ratio?: number;
-  /** 媒体 URL（相对本地或绝对 CDN） */
   src: string;
-  /** 可选：视频的海报图 */
   poster?: string;
 }
 
-/**
- * 构造图片数据（按三大分类 + 文件列目录对应）
- * 比例在图片加载后用 ResizeObserver/load 事件补齐，未加载前用默认 3:4，不影响瀑布流计算。
- */
+/** 瀑布流中：按列宽与 ratio 计算卡片高度(px)，夹到 [MIN_H, MAX_H] */
+function clampedHeight(ratio: number, colWidth: number) {
+  const raw = ratio > 0 ? colWidth / ratio : colWidth * (4 / 3);
+  return Math.max(MIN_H, Math.min(MAX_H, raw));
+}
+
+/* ---------- 数据源（34 项：30 图 + 4 视频） ---------- */
+
 const IMAGE_ITEMS: MediaItem[] = [
-  // —— 漫剧 ——
+  // 漫剧(8)
   ...[
-    ['青云大殿.png', '青云大殿', '漫剧场景概念设计：云雾萦绕的仙山宫殿。'],
-    ['诛仙台.png', '诛仙台', '漫剧关键剧情场景：诛仙祭台。'],
-    ['萧珩.png', '萧珩', '男主角·萧珩 角色立绘。'],
-    ['苏挽.png', '苏挽', '女主角·苏挽 角色立绘。'],
-    ['墨断剑红绳.png', '墨断剑与红绳', '关键道具概念：断剑与象征羁绊的红绳。'],
-    ['灭门旧夜.png', '灭门旧夜', '第二幕回忆场景：雨夜的灭门之夜。'],
-    ['玄青上人.png', '玄青上人', '配角·玄青上人 角色立绘。'],
-    ['墨玉牌.png', '墨玉牌', '贯穿主线的信物·墨玉牌设定图。'],
+    ['青云大殿.png', '青云大殿', '漫剧场景概念：仙山宫殿。'],
+    ['诛仙台.png', '诛仙台', '漫剧关键场景：诛仙祭台。'],
+    ['萧珩.png', '萧珩', '男主角·萧珩 立绘。'],
+    ['苏挽.png', '苏挽', '女主角·苏挽 立绘。'],
+    ['墨断剑红绳.png', '墨断剑与红绳', '关键道具概念。'],
+    ['灭门旧夜.png', '灭门旧夜', '雨夜的灭门回忆场景。'],
+    ['玄青上人.png', '玄青上人', '配角·玄青上人 立绘。'],
+    ['墨玉牌.png', '墨玉牌', '主线信物·墨玉牌设定图。'],
   ].map<MediaItem>(([file, title, description]) => ({
-    id: `manju-${file}`,
+    id: `manju-img-${file}`,
     kind: 'image',
     category: 'manju',
-    categoryLabel: '漫剧',
+    categoryLabel: CAT_LABEL.manju,
     title,
     description,
     src: `${BASE}/漫剧/${encodeURIComponent(file)}`,
   })),
 
-  // —— 电商 ——
-  ...[1, 2, 3, 4, 5, 6].map<MediaItem>((n) => ({
-    id: `ecom-${n}`,
+  // 电商(6)
+  ...Array.from({ length: 6 }, (_, i) => i + 1).map<MediaItem>((n) => ({
+    id: `ecom-img-${n}`,
     kind: 'image',
     category: 'ecom',
-    categoryLabel: '电商',
+    categoryLabel: CAT_LABEL.ecom,
     title: `电商作品 ${n}`,
-    description: '电商视觉与商品详情页设计稿。',
+    description: '电商视觉与详情页设计。',
     src: `${BASE}/电商/${n}.png`,
   })),
 
-  // —— 建筑 ——
-  // 1-8 为 .png，9-16 为 .jpeg
+  // 建筑(16): 1-8 png, 9-16 jpeg
   ...Array.from({ length: 8 }, (_, i) => i + 1).map<MediaItem>((n) => ({
-    id: `arch-${n}`,
+    id: `arch-img-${n}-png`,
     kind: 'image',
     category: 'arch',
-    categoryLabel: '建筑',
+    categoryLabel: CAT_LABEL.arch,
     title: `建筑作品 ${n}`,
-    description: '建筑概念渲染与空间设计。',
+    description: '建筑概念渲染。',
     src: `${BASE}/建筑/${n}.png`,
   })),
   ...Array.from({ length: 8 }, (_, i) => i + 9).map<MediaItem>((n) => ({
-    id: `arch-${n}`,
+    id: `arch-img-${n}-jpeg`,
     kind: 'image',
     category: 'arch',
-    categoryLabel: '建筑',
+    categoryLabel: CAT_LABEL.arch,
     title: `建筑作品 ${n}`,
-    description: '建筑概念渲染与空间设计。',
+    description: '建筑概念渲染。',
     src: `${BASE}/建筑/${n}.jpeg`,
   })),
 ];
 
-/** 筛选分类按钮 */
-const FILTERS: { key: Category; label: string }[] = [
-  { key: 'all', label: '全部' },
-  { key: 'manju', label: '漫剧' },
-  { key: 'ecom', label: '电商' },
-  { key: 'arch', label: '建筑' },
+const VIDEO_ITEMS: MediaItem[] = [
+  {
+    id: 'v-manju-chengpin',
+    kind: 'video',
+    category: 'manju',
+    categoryLabel: CAT_LABEL.manju,
+    title: '漫剧成片',
+    description: '漫剧正片剪辑演示。',
+    src: 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%AB%E5%89%A7%E6%88%90%E5%93%81.mp4',
+    poster: `${BASE}/漫剧/${encodeURIComponent('青云大殿.png')}`,
+    ratio: 16 / 9,
+  },
+  {
+    id: 'v-manju-tour-1',
+    kind: 'video',
+    category: 'manju',
+    categoryLabel: CAT_LABEL.manju,
+    title: '漫游视频 1',
+    description: '第一视角漫游展示（一）。',
+    src: 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%AB%E6%B8%B8%E8%A7%86%E9%A2%911.mp4',
+    poster: `${BASE}/漫剧/${encodeURIComponent('诛仙台.png')}`,
+    ratio: 16 / 9,
+  },
+  {
+    id: 'v-manju-tour-2',
+    kind: 'video',
+    category: 'manju',
+    categoryLabel: CAT_LABEL.manju,
+    title: '漫游视频 2',
+    description: '第一视角漫游展示（二）。',
+    src: 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%AB%E6%B8%B8%E8%A7%86%E9%A2%912.mp4',
+    poster: `${BASE}/漫剧/${encodeURIComponent('墨玉牌.png')}`,
+    ratio: 16 / 9,
+  },
+  {
+    id: 'v-arch-1',
+    kind: 'video',
+    category: 'arch',
+    categoryLabel: CAT_LABEL.arch,
+    title: '建筑动画 1',
+    description: '建筑空间漫游动画演示。',
+    src: 'https://demovideo.tos-cn-shanghai.volces.com/1.mp4',
+    poster: `${BASE}/建筑/1.png`,
+    ratio: 16 / 9,
+  },
 ];
 
+const ALL_ITEMS: MediaItem[] = [...IMAGE_ITEMS, ...VIDEO_ITEMS];
+const TOTAL_COUNT = ALL_ITEMS.length;
+
+/* ---------- 打散算法：随机 + 均衡 + 最大连续 3 ---------- */
+
+function fisherYates<T>(arr: T[]): T[] {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/**
+ * 均衡打散：保证比例基本一致、同类不连续超过 MAX_RUN 项。
+ * 策略：按各分类"剩余配额"加权轮询抽取，天然分布均衡；事后做一次 repair，滑窗修掉超长连续段。
+ */
+const MAX_RUN = 3;
+function balancedShuffle<T extends { category: string }>(items: T[]): T[] {
+  if (items.length === 0) return [];
+  // 统计各分类总体目标配额
+  const target = new Map<string, number>();
+  for (const it of items) target.set(it.category, (target.get(it.category) ?? 0) + 1);
+
+  const remaining = new Map<string, T[]>(
+    Array.from(target.keys()).map((k) => [k, items.filter((i) => i.category === k)]),
+  );
+  for (const [, arr] of remaining) {
+    // 分类内部也先做一次 Fisher-Yates，避免同一文件夹顺序被保留
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+  }
+
+  const result: T[] = [];
+  let runKey: string | null = null;
+  let runLen = 0;
+
+  while (result.length < items.length) {
+    // 候选：还有剩余的分类
+    const candidates = Array.from(remaining.entries()).filter(([, arr]) => arr.length > 0);
+    if (candidates.length === 0) break;
+
+    // 若已达 MAX_RUN，排除同类
+    const allowed =
+      runLen >= MAX_RUN
+        ? candidates.filter(([k]) => k !== runKey)
+        : candidates;
+    const pool = allowed.length > 0 ? allowed : candidates;
+
+    // 按"剩余配额"加权抽取（剩余越多越容易被抽到），实现各段均匀
+    const totalLeft = pool.reduce<number>((s, [, arr]) => s + arr.length, 0) || 1;
+    let r = Math.random() * totalLeft;
+    let pick: [string, T[]] = pool[0];
+    for (const c of pool) {
+      r -= c[1].length;
+      if (r <= 0) {
+        pick = c;
+        break;
+      }
+    }
+    const [pKey, pArr] = pick;
+    const item = pArr.pop()!;
+    result.push(item);
+
+    if (pKey === runKey) runLen++;
+    else {
+      runKey = pKey;
+      runLen = 1;
+    }
+  }
+
+  // 兜底 repair：若仍出现超过 MAX_RUN 的同类（例如某类只剩它自己），则滑窗跟后面的异类交换
+  for (let start = 0; start < result.length - 1; ) {
+    let end = start;
+    while (end + 1 < result.length && result[end + 1].category === result[start].category) {
+      end++;
+    }
+    const run = end - start + 1;
+    if (run > MAX_RUN) {
+      // 找到 [start, end] 段中 MAX_RUN 后面第一个位置，与后面最近的异类交换
+      const swapAt = start + MAX_RUN;
+      let swapWith = end + 1;
+      while (swapWith < result.length && result[swapWith].category === result[start].category) {
+        swapWith++;
+      }
+      if (swapWith < result.length) {
+        [result[swapAt], result[swapWith]] = [result[swapWith], result[swapAt]];
+        // 重新从段首检查(交换后可能引入新段)
+        start = swapAt;
+        continue;
+      }
+    }
+    start = end + 1;
+  }
+
+  return result;
+}
+
+/* ---------- 组件 ---------- */
+
 export function PortfolioPage() {
-  const [filter, setFilter] = useState<Category>('all');
   const [columns, setColumns] = useState<number>(4);
   const [openItem, setOpenItem] = useState<MediaItem | null>(null);
-  /** 为已加载到的图片补齐比例（宽/高），用于下一次布局重算 */
+  /** 已探测到的真实比例(id -> w/h)，用于下次布局 */
   const [ratios, setRatios] = useState<Record<string, number>>({});
+  /** 为"每次刷新"提供新的打散顺序种子（触发 useMemo 重新洗牌） */
+  const [shuffleSeed, setShuffleSeed] = useState<number>(() => Math.random());
 
-  // —— 响应式：根据视口宽度确定列数 ——
+  // 响应式列数
   useEffect(() => {
     function update() {
       const w = window.innerWidth;
@@ -116,7 +268,12 @@ export function PortfolioPage() {
     return () => window.removeEventListener('resize', update);
   }, []);
 
-  // —— ESC 关闭详情弹窗 ——
+  // 每次挂载(刷新)用新种子 → 每次顺序都不一样，验证"随机性"
+  useEffect(() => {
+    setShuffleSeed(Math.random());
+  }, []);
+
+  // ESC 关闭
   useEffect(() => {
     if (!openItem) return;
     function onKey(e: KeyboardEvent) {
@@ -126,27 +283,29 @@ export function PortfolioPage() {
     return () => window.removeEventListener('keydown', onKey);
   }, [openItem]);
 
-  // —— 按分类过滤 ——
-  const items = useMemo(
-    () => (filter === 'all' ? IMAGE_ITEMS : IMAGE_ITEMS.filter((i) => i.category === filter)),
-    [filter],
+  // 混合展示顺序（shuffleSeed 变则重新洗牌）
+  const shuffledItems = useMemo(
+    () => balancedShuffle(ALL_ITEMS),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [shuffleSeed],
   );
 
-  // —— 核心：最短列瀑布流算法，按 items -> columns 分配 ——
-  const { columnWidth, columnsArray } = useMemo(() => {
+  // 最短列分桶 + 基于 clamp 高度近似的列高累计
+  const { columnWidth, columnsArray, containerWidth } = useMemo(() => {
     const colCount = Math.max(1, columns);
-    // 先预估每个元素的高度(以"列宽"为基准，按比例或默认3:4)
-    const sized = items.map((it) => {
-      const r = ratios[it.id] ?? it.ratio ?? 0.75; // 默认 3:4（w:h）
-      // 元素在列中的"占用高度"（以列宽为1的相对单位，不含 gap）
-      // h = colWidth / ratio => 相对单位(以colWidth为1)就是 1/ratio
-      return { it, relH: 1 / r };
+    // 容器按 max-w-7xl（1280px）- padding 近似，但我们用"列宽计算式"配合实际渲染，
+    // 这里用占位 colWidthEstimate=320 来算分桶的相对累计高度（不会影响最终显示的真实高度，只是决定哪个列"更矮"）
+    const colWidthEstimate = 320;
+
+    const sized = shuffledItems.map((it) => {
+      const r = ratios[it.id] ?? it.ratio ?? 0.75;
+      return { it, pxH: clampedHeight(r, colWidthEstimate) };
     });
 
     const colHeights = new Array<number>(colCount).fill(0);
     const buckets: MediaItem[][] = Array.from({ length: colCount }, () => []);
-    // 累计高度（含元素之间的 GUTTER，相对 colWidth）
-    for (const { it, relH } of sized) {
+
+    for (const { it, pxH } of sized) {
       let idx = 0;
       let min = colHeights[0];
       for (let i = 1; i < colCount; i++) {
@@ -156,47 +315,26 @@ export function PortfolioPage() {
         }
       }
       buckets[idx].push(it);
-      colHeights[idx] = colHeights[idx] + relH; // 加上本卡片高度单位
-      // 加上卡片之间的间距换算单位（GUTTER / colWidth，先用近似 0 不影响，渲染由 gap 处理）
-      // 注意：视觉间距由父容器 flex gap 提供，这里只关心各列高度错落
+      colHeights[idx] = colHeights[idx] + pxH + GUTTER;
     }
+
     return {
       columnsArray: buckets,
       columnWidth: `calc((100% - ${(colCount - 1) * GUTTER}px) / ${colCount})`,
+      containerWidth: colCount * colWidthEstimate + (colCount - 1) * GUTTER,
     };
-  }, [columns, items, ratios]);
+  }, [columns, shuffledItems, ratios]);
 
-  // 记录图片真实比例 -> 触发 useMemo 重新分桶
-  function onImgLoaded(id: string, w: number, h: number) {
+  function onMediaLoad(id: string, w: number, h: number) {
     if (!w || !h) return;
-    setRatios((prev) => (prev[id] === w / h ? prev : { ...prev, [id]: w / h }));
+    const ratio = w / h;
+    setRatios((prev) => (prev[id] === ratio ? prev : { ...prev, [id]: ratio }));
   }
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-6">
-      {/* 分类筛选按钮 —— 风格与 Demo/Prd 页按钮一致 */}
-      <div className="mx-auto mb-6 flex w-full justify-center gap-2">
-        {FILTERS.map((f) => {
-          const active = filter === f.key;
-          return (
-            <button
-              key={f.key}
-              type="button"
-              onClick={() => setFilter(f.key)}
-              className={[
-                'flex-1 rounded border px-4 py-2 text-sm font-medium transition-colors max-w-[260px]',
-                active
-                  ? 'border-[#333333] bg-[#333333] text-white shadow-md'
-                  : 'border-[#E5E5E5] bg-white text-[#333333] hover:bg-[#F5F5F5]',
-              ].join(' ')}
-            >
-              {f.label}
-            </button>
-          );
-        })}
-      </div>
+      {/* 分类筛选按钮已按要求移除 —— 所有内容混合展示 */}
 
-      {/* 瀑布流容器：多列 flex，每列一个 flex 容器，列高自适应 */}
       <div className="flex w-full" style={{ gap: `${GUTTER}px` }}>
         {columnsArray.map((col, colIdx) => (
           <div
@@ -209,7 +347,8 @@ export function PortfolioPage() {
                 <Card
                   key={it.id}
                   item={it}
-                  onLoad={onImgLoaded}
+                  ratio={ratios[it.id] ?? it.ratio}
+                  onLoad={onMediaLoad}
                   onClick={() => setOpenItem(it)}
                 />
               ))}
@@ -218,7 +357,7 @@ export function PortfolioPage() {
         ))}
       </div>
 
-      {/* 点击查看详情 —— Lightbox 弹窗（半透明遮罩 + 居中大图） */}
+      {/* Lightbox 详情弹窗 */}
       {openItem && (
         <div
           role="dialog"
@@ -272,24 +411,48 @@ export function PortfolioPage() {
   );
 }
 
-/** 瀑布流卡片：带懒加载、淡入动画、悬停遮罩 */
+/* ---------- 卡片：高度按原始比例 + [200,600] clamp ---------- */
+
 function Card({
   item,
+  ratio,
   onLoad,
   onClick,
 }: {
   item: MediaItem;
+  ratio?: number;
   onLoad: (id: string, w: number, h: number) => void;
   onClick: () => void;
 }) {
-  const [show, setShow] = useState(false);
-  // ratio 未知时先用 3:4 占位撑高，避免布局跳动；图片加载完成后 onLoad 会触发整体重算
-  const aspect = `aspect-[3/4]`;
+  const [shown, setShown] = useState(false);
+  // 当 ratio 已知时，给外层 div 一个"按列宽100%的 h=colWidth/ratio"的高度，
+  // 并强制 clamp(200..600)。未知时先用 3:4，等 onLoad 触发重算。
+  const r = ratio ?? item.ratio ?? 0.75;
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
-      className={`group relative w-full cursor-pointer overflow-hidden rounded-md border border-[#EFEFEF] bg-white transition-all duration-300 ease-out hover:shadow-lg hover:-translate-y-0.5 ${aspect} ${show ? 'opacity-100' : 'opacity-0'} animate-fadeInCard`}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      className={[
+        'group relative w-full cursor-pointer overflow-hidden rounded-md border border-[#EFEFEF] bg-white',
+        'transition-all duration-300 ease-out hover:shadow-lg hover:-translate-y-0.5',
+        shown ? 'opacity-100' : 'opacity-0 animate-fadeInCard',
+      ].join(' ')}
+      style={{
+        // padding-top 的方式实现"根据容器宽度+比例"的响应式高度，避免硬编码像素影响响应式。
+        // 再用 maxHeight/minHeight 的 CSS 变量 + 媒体查询在 style 里做 clamp 兜底
+        aspectRatio: `${r}`,
+        // 但 aspectRatio 不能控制高度上限，所以还要给 maxHeight/minHeight
+        maxHeight: MAX_H,
+        minHeight: MIN_H,
+      }}
     >
       {item.kind === 'image' ? (
         <img
@@ -300,10 +463,16 @@ function Card({
           onLoad={(e) => {
             const t = e.currentTarget;
             onLoad(item.id, t.naturalWidth, t.naturalHeight);
-            setShow(true);
+            setShown(true);
           }}
-          onError={() => setShow(true)}
-          className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+          onError={() => setShown(true)}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block',
+          }}
+          className="transition-transform duration-500 ease-out group-hover:scale-[1.03]"
         />
       ) : (
         <video
@@ -315,18 +484,23 @@ function Card({
           onLoadedMetadata={(e) => {
             const t = e.currentTarget;
             onLoad(item.id, t.videoWidth, t.videoHeight);
-            setShow(true);
+            setShown(true);
           }}
           onMouseEnter={(e) => e.currentTarget.play().catch(() => {})}
           onMouseLeave={(e) => {
             e.currentTarget.pause();
-            e.currentTarget.currentTime = 0;
+            try {
+              e.currentTarget.currentTime = 0;
+            } catch {
+              /* ignore */
+            }
           }}
-          className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          className="transition-transform duration-500 ease-out group-hover:scale-[1.03]"
         />
       )}
 
-      {/* 悬停遮罩：分类 + 标题 */}
+      {/* 悬停遮罩：分类标签 + 标题 */}
       <div className="pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/70 via-black/20 to-transparent p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
         <div className="flex items-center gap-2">
           <span className="rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-medium text-[#333]">
