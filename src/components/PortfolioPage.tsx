@@ -23,7 +23,7 @@ const CATEGORY_CONTENT: Record<PortfolioCategory, CategoryContent> = {
   漫剧: {
     left: {
       kind: 'webpage',
-      src: `${BASE}/漫剧/html.html`,
+      src: 'https://demovideo.tos-cn-shanghai.volces.com/mock-manju/html.html',
     },
     grid: [
       // 第 1 行左：漫剧演示视频
