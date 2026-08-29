@@ -21,15 +21,13 @@ const BREAKPOINTS: { minWidth: number; columns: number }[] = [
 const MAX_H = 600;
 const MIN_H = 200;
 
-/** 全站统一的项目分类（电商领域 · 带货视频）。作用：分类标签 / 项目属性 / 详情描述。 */
-const SITE_CATEGORY_LABEL = '电商领域 · 带货视频';
-
-type CatKey = 'manju' | 'ecom' | 'arch';
+/** 分类标签严格三分法：图片按源文件夹（电商/漫剧），视频统一为"视频" */
 const CAT_LABEL: Record<CatKey, string> = {
-  manju: SITE_CATEGORY_LABEL,
-  ecom: SITE_CATEGORY_LABEL,
-  arch: SITE_CATEGORY_LABEL,
+  manju: '漫剧',
+  ecom: '电商',
+  arch: '电商', // 建筑文件夹图片也归入"电商"标签（三分法只保留 电商/漫剧/视频）
 };
+const VIDEO_LABEL = '视频'; // 所有视频的统一标签
 
 interface MediaItem {
   id: string;
@@ -44,17 +42,6 @@ interface MediaItem {
   poster?: string;
 }
 
-/** 把"原始文件的描述"重写为电商语境的带货视频描述（作为兜底统一用文案，不同文件名给出略微差异化的描述避免重复） */
-function formatEcomDescription(title: string, folderHint: CatKey) {
-  // 统一为电商·带货视频领域描述，避免原"漫剧场景概念"等非电商描述残留
-  const subjects: Record<CatKey, string> = {
-    manju: '国风主题短视频',
-    ecom: '产品主图短视频',
-    arch: '空间氛围短视频',
-  };
-  return `电商领域·带货视频：${subjects[folderHint]}《${title}》。面向商品落地页 / 信息流投放 / 详情页头图场景，突出卖点、情绪与转化节奏。`;
-}
-
 /** 瀑布流中：按列宽与 ratio 计算卡片高度(px)，夹到 [MIN_H, MAX_H] */
 function clampedHeight(ratio: number, colWidth: number) {
   const raw = ratio > 0 ? colWidth / ratio : colWidth * (4 / 3);
@@ -64,7 +51,7 @@ function clampedHeight(ratio: number, colWidth: number) {
 /* ---------- 数据源（34 项：30 图 + 4 视频） ---------- */
 
 const IMAGE_ITEMS: MediaItem[] = [
-  // 漫剧(8) → 统一为"电商领域 · 带货视频"分类与描述
+  // 漫剧(8) → 标签"漫剧"
   ...[
     ['青云大殿.png', '青云大殿'],
     ['诛仙台.png', '诛仙台'],
@@ -78,40 +65,40 @@ const IMAGE_ITEMS: MediaItem[] = [
     id: `manju-img-${file}`,
     kind: 'image',
     category: 'manju',
-    categoryLabel: SITE_CATEGORY_LABEL,
+    categoryLabel: CAT_LABEL.manju,
     title,
-    description: formatEcomDescription(title, 'manju'),
+    description: title,
     src: `${BASE}/漫剧/${encodeURIComponent(file)}`,
   })),
 
-  // 电商(6) → 统一为"电商领域 · 带货视频"分类与描述
+  // 电商(6) → 标签"电商"
   ...Array.from({ length: 6 }, (_, i) => i + 1).map<MediaItem>((n) => ({
     id: `ecom-img-${n}`,
     kind: 'image',
     category: 'ecom',
-    categoryLabel: SITE_CATEGORY_LABEL,
+    categoryLabel: CAT_LABEL.ecom,
     title: `电商作品 ${n}`,
-    description: formatEcomDescription(`电商作品 ${n}`, 'ecom'),
+    description: `电商作品 ${n}`,
     src: `${BASE}/电商/${n}.png`,
   })),
 
-  // 建筑(16): 1-8 png, 9-16 jpeg → 统一为"电商领域 · 带货视频"分类与描述
+  // 建筑(16): 1-8 png, 9-16 jpeg → 标签"电商"
   ...Array.from({ length: 8 }, (_, i) => i + 1).map<MediaItem>((n) => ({
     id: `arch-img-${n}-png`,
     kind: 'image',
     category: 'arch',
-    categoryLabel: SITE_CATEGORY_LABEL,
+    categoryLabel: CAT_LABEL.arch,
     title: `建筑作品 ${n}`,
-    description: formatEcomDescription(`建筑作品 ${n}`, 'arch'),
+    description: `建筑作品 ${n}`,
     src: `${BASE}/建筑/${n}.png`,
   })),
   ...Array.from({ length: 8 }, (_, i) => i + 9).map<MediaItem>((n) => ({
     id: `arch-img-${n}-jpeg`,
     kind: 'image',
     category: 'arch',
-    categoryLabel: SITE_CATEGORY_LABEL,
+    categoryLabel: CAT_LABEL.arch,
     title: `建筑作品 ${n}`,
-    description: formatEcomDescription(`建筑作品 ${n}`, 'arch'),
+    description: `建筑作品 ${n}`,
     src: `${BASE}/建筑/${n}.jpeg`,
   })),
 ];
@@ -121,9 +108,9 @@ const VIDEO_ITEMS: MediaItem[] = [
     id: 'v-manju-chengpin',
     kind: 'video',
     category: 'manju',
-    categoryLabel: SITE_CATEGORY_LABEL,
+    categoryLabel: VIDEO_LABEL,
     title: '漫剧成片',
-    description: formatEcomDescription('漫剧成片', 'manju'),
+    description: '漫剧成片',
     src: 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%AB%E5%89%A7%E6%88%90%E5%93%81.mp4',
     poster: `${BASE}/漫剧/${encodeURIComponent('青云大殿.png')}`,
     ratio: 16 / 9,
@@ -132,9 +119,9 @@ const VIDEO_ITEMS: MediaItem[] = [
     id: 'v-manju-tour-1',
     kind: 'video',
     category: 'manju',
-    categoryLabel: SITE_CATEGORY_LABEL,
+    categoryLabel: VIDEO_LABEL,
     title: '漫游视频 1',
-    description: formatEcomDescription('漫游视频 1', 'manju'),
+    description: '漫游视频 1',
     src: 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%AB%E6%B8%B8%E8%A7%86%E9%A2%911.mp4',
     poster: `${BASE}/漫剧/${encodeURIComponent('诛仙台.png')}`,
     ratio: 16 / 9,
@@ -143,9 +130,9 @@ const VIDEO_ITEMS: MediaItem[] = [
     id: 'v-manju-tour-2',
     kind: 'video',
     category: 'manju',
-    categoryLabel: SITE_CATEGORY_LABEL,
+    categoryLabel: VIDEO_LABEL,
     title: '漫游视频 2',
-    description: formatEcomDescription('漫游视频 2', 'manju'),
+    description: '漫游视频 2',
     src: 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%AB%E6%B8%B8%E8%A7%86%E9%A2%912.mp4',
     poster: `${BASE}/漫剧/${encodeURIComponent('墨玉牌.png')}`,
     ratio: 16 / 9,
@@ -154,9 +141,9 @@ const VIDEO_ITEMS: MediaItem[] = [
     id: 'v-arch-1',
     kind: 'video',
     category: 'arch',
-    categoryLabel: SITE_CATEGORY_LABEL,
+    categoryLabel: VIDEO_LABEL,
     title: '建筑动画 1',
-    description: formatEcomDescription('建筑动画 1', 'arch'),
+    description: '建筑动画 1',
     src: 'https://demovideo.tos-cn-shanghai.volces.com/1.mp4',
     poster: `${BASE}/建筑/1.png`,
     ratio: 16 / 9,
@@ -445,7 +432,7 @@ export function PortfolioPage() {
         ))}
       </div>
 
-      {/* Lightbox 详情弹窗 */}
+      {/* Lightbox 详情弹窗 —— 只展示媒体本体 + 关闭按钮（无右侧文字面板） */}
       {openItem && (
         <div
           role="dialog"
@@ -466,31 +453,25 @@ export function PortfolioPage() {
             >
               关闭 ×
             </button>
-            <div className="flex max-h-[85vh] w-full flex-col md:flex-row">
-              <div className="flex flex-1 items-center justify-center bg-[#FAFAFA] p-3 md:p-6">
-                {openItem.kind === 'image' ? (
-                  <img
-                    src={openItem.src}
-                    alt={openItem.title}
-                    className="max-h-[65vh] w-auto max-w-full object-contain"
-                  />
-                ) : (
-                  <video
-                    src={openItem.src}
-                    poster={openItem.poster}
-                    controls
-                    playsInline
-                    className="max-h-[65vh] w-auto max-w-full"
-                  />
-                )}
-              </div>
-              <div className="flex w-full shrink-0 flex-col gap-2 border-t border-[#E5E5E5] p-5 md:w-72 md:border-l md:border-t-0">
-                <div className="inline-flex w-fit rounded bg-[#F5F5F5] px-2 py-0.5 text-xs text-[#666]">
-                  {openItem.categoryLabel}
-                </div>
-                <h3 className="text-lg font-semibold text-[#1A1A1A]">{openItem.title}</h3>
-                <p className="text-sm leading-relaxed text-[#666]">{openItem.description}</p>
-              </div>
+            <div className="flex max-h-[85vh] w-full items-center justify-center bg-[#FAFAFA] p-3 md:p-6">
+              {openItem.kind === 'image' ? (
+                <img
+                  src={openItem.src}
+                  alt={openItem.title}
+                  className="max-h-[75vh] w-auto max-w-full object-contain"
+                />
+              ) : (
+                <video
+                  src={openItem.src}
+                  poster={openItem.poster}
+                  controls
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="max-h-[75vh] w-auto max-w-full"
+                />
+              )}
             </div>
           </div>
         </div>
