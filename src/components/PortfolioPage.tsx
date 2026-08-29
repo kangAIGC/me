@@ -334,24 +334,11 @@ export function PortfolioPage() {
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-6">
-      {/* ======= 顶部 2×2 特色视频区（最前端 · 与下方图片瀑布流做明显视觉区分） ======= */}
+      {/* ======= 顶部 2×2 视频区（最前端 · 外层样式与图片卡统一） ======= */}
       <section
         aria-label="特色视频"
-        className="mb-6 rounded-lg border-2 border-[#BBBBBB] bg-[#FAFAFA] p-3"
+        className="mb-2"
       >
-        <div className="mb-2 flex items-center justify-between px-1">
-          <div className="flex items-center gap-2 text-sm font-semibold text-[#1A1A1A]">
-            <span
-              aria-hidden
-              className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#333] text-[10px] leading-none text-white"
-            >
-              ▶
-            </span>
-            <span>精选视频</span>
-          </div>
-          <span className="text-xs text-[#999]">自动循环播放 · 悬停可放大</span>
-        </div>
-
         <div
           className="grid w-full"
           style={{
@@ -371,7 +358,8 @@ export function PortfolioPage() {
                   setOpenItem(v);
                 }
               }}
-              className="group relative w-full cursor-pointer overflow-hidden rounded-md border-2 border-[#333333]/70 bg-black shadow-sm transition-all duration-300 ease-out hover:shadow-lg hover:-translate-y-0.5"
+              // 视频卡外层与图片卡完全一致：圆角 1px 浅灰边、白底、hover 统一效果（去掉之前的黑粗边 / 黑底）
+              className="group relative w-full cursor-pointer overflow-hidden rounded-md border border-[#EFEFEF] bg-white transition-all duration-300 ease-out hover:shadow-lg hover:-translate-y-0.5"
               style={{ aspectRatio: (v.ratio ?? 16 / 9).toString(), maxHeight: MAX_H, minHeight: MIN_H }}
             >
               <video
@@ -382,19 +370,16 @@ export function PortfolioPage() {
                 loop
                 muted
                 playsInline
-                webkit-playsinline="true"
                 onCanPlay={(e) => {
-                  // 确保在被浏览器策略临时暂停后（如 tab 切回）立刻继续，无缝循环
                   const el = e.currentTarget;
                   if (el.paused) el.play().catch(() => {});
                 }}
                 onWaiting={(e) => {
-                  // 卡顿等待时显示 poster，避免"黑屏间隙"破坏无缝观感
                   const el = e.currentTarget;
                   el.setAttribute('data-waiting', '1');
                   setTimeout(() => el.removeAttribute('data-waiting'), 300);
                 }}
-                className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                 style={{
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
@@ -402,32 +387,13 @@ export function PortfolioPage() {
                 }}
               />
 
-              {/* 播放角标（视觉区分：深灰底 + 白色三角播放按钮） */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute left-2 top-2 flex items-center gap-1 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-[1px]"
-              >
-                <span className="translate-x-[0.5px]">▶</span>
-                <span className="uppercase tracking-wide">Video</span>
-              </div>
-
-              {/* 中央淡播放图标（悬停放大，进一步与图片区区分） */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0 flex items-center justify-center text-white/0 transition-all duration-300 group-hover:bg-black/15 group-hover:text-white"
-              >
-                <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-white/90 bg-white/10 text-2xl shadow-2xl backdrop-blur-sm">
-                  ▶
-                </div>
-              </div>
-
-              {/* 下方信息条（分类 + 标题） */}
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/80 via-black/25 to-transparent px-3 pb-2 pt-8 text-white">
-                <div className="truncate">
-                  <div className="inline-block rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-medium text-[#333]">
+              {/* 下方信息条（分类 + 标题）与图片卡的遮罩风格一致 */}
+              <div className="pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/70 via-black/20 to-transparent p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                <div className="flex items-center gap-2">
+                  <span className="rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-medium text-[#333]">
                     {v.categoryLabel}
-                  </div>
-                  <div className="mt-1 truncate text-sm font-semibold">{v.title}</div>
+                  </span>
+                  <span className="truncate text-sm font-semibold text-white">{v.title}</span>
                 </div>
               </div>
             </div>
@@ -435,7 +401,8 @@ export function PortfolioPage() {
         </div>
       </section>
 
-      {/* ======= 图片作品瀑布流（主内容区 · 不包含视频） ======= */}      <div className="flex w-full" style={{ gap: `${GUTTER}px` }}>
+      {/* ======= 图片作品瀑布流（主内容区 · 不包含视频） ======= */}
+      <div className="flex w-full" style={{ gap: `${GUTTER}px` }}>
         {columnsArray.map((col, colIdx) => (
           <div
             key={colIdx}
