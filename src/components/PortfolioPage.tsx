@@ -145,8 +145,9 @@ const VIDEO_ITEMS: MediaItem[] = [
   },
 ];
 
-const ALL_ITEMS: MediaItem[] = [...IMAGE_ITEMS, ...VIDEO_ITEMS];
-const TOTAL_COUNT = ALL_ITEMS.length;
+/* 瀑布流仅处理图片（视频独立放在顶部 2×2 特色区，不参与打散） */
+const SHUFFLE_ITEMS: MediaItem[] = IMAGE_ITEMS;
+const TOTAL_COUNT = SHUFFLE_ITEMS.length;
 
 /* ---------- 打散算法：随机 + 均衡 + 最大连续 3 ---------- */
 
@@ -283,9 +284,9 @@ export function PortfolioPage() {
     return () => window.removeEventListener('keydown', onKey);
   }, [openItem]);
 
-  // 混合展示顺序（shuffleSeed 变则重新洗牌）
+  // 混合展示顺序（shuffleSeed 变则重新洗牌）—— 仅图片 30 张参与打散瀑布
   const shuffledItems = useMemo(
-    () => balancedShuffle(ALL_ITEMS),
+    () => balancedShuffle(SHUFFLE_ITEMS),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [shuffleSeed],
   );
@@ -333,9 +334,108 @@ export function PortfolioPage() {
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-6">
-      {/* 分类筛选按钮已按要求移除 —— 所有内容混合展示 */}
+      {/* ======= 顶部 2×2 特色视频区（最前端 · 与下方图片瀑布流做明显视觉区分） ======= */}
+      <section
+        aria-label="特色视频"
+        className="mb-6 rounded-lg border-2 border-[#BBBBBB] bg-[#FAFAFA] p-3"
+      >
+        <div className="mb-2 flex items-center justify-between px-1">
+          <div className="flex items-center gap-2 text-sm font-semibold text-[#1A1A1A]">
+            <span
+              aria-hidden
+              className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#333] text-[10px] leading-none text-white"
+            >
+              ▶
+            </span>
+            <span>精选视频</span>
+          </div>
+          <span className="text-xs text-[#999]">自动循环播放 · 悬停可放大</span>
+        </div>
 
-      <div className="flex w-full" style={{ gap: `${GUTTER}px` }}>
+        <div
+          className="grid w-full"
+          style={{
+            gridTemplateColumns: '1fr 1fr',
+            gap: `${GUTTER}px`,
+          }}
+        >
+          {VIDEO_ITEMS.map((v) => (
+            <div
+              key={v.id}
+              role="button"
+              tabIndex={0}
+              onClick={() => setOpenItem(v)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setOpenItem(v);
+                }
+              }}
+              className="group relative w-full cursor-pointer overflow-hidden rounded-md border-2 border-[#333333]/70 bg-black shadow-sm transition-all duration-300 ease-out hover:shadow-lg hover:-translate-y-0.5"
+              style={{ aspectRatio: (v.ratio ?? 16 / 9).toString(), maxHeight: MAX_H, minHeight: MIN_H }}
+            >
+              <video
+                src={v.src}
+                poster={v.poster}
+                preload="auto"
+                autoPlay
+                loop
+                muted
+                playsInline
+                webkit-playsinline="true"
+                onCanPlay={(e) => {
+                  // 确保在被浏览器策略临时暂停后（如 tab 切回）立刻继续，无缝循环
+                  const el = e.currentTarget;
+                  if (el.paused) el.play().catch(() => {});
+                }}
+                onWaiting={(e) => {
+                  // 卡顿等待时显示 poster，避免"黑屏间隙"破坏无缝观感
+                  const el = e.currentTarget;
+                  el.setAttribute('data-waiting', '1');
+                  setTimeout(() => el.removeAttribute('data-waiting'), 300);
+                }}
+                className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                style={{
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundImage: v.poster ? `url(${v.poster})` : undefined,
+                }}
+              />
+
+              {/* 播放角标（视觉区分：深灰底 + 白色三角播放按钮） */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute left-2 top-2 flex items-center gap-1 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-[1px]"
+              >
+                <span className="translate-x-[0.5px]">▶</span>
+                <span className="uppercase tracking-wide">Video</span>
+              </div>
+
+              {/* 中央淡播放图标（悬停放大，进一步与图片区区分） */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 flex items-center justify-center text-white/0 transition-all duration-300 group-hover:bg-black/15 group-hover:text-white"
+              >
+                <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-white/90 bg-white/10 text-2xl shadow-2xl backdrop-blur-sm">
+                  ▶
+                </div>
+              </div>
+
+              {/* 下方信息条（分类 + 标题） */}
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/80 via-black/25 to-transparent px-3 pb-2 pt-8 text-white">
+                <div className="truncate">
+                  <div className="inline-block rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-medium text-[#333]">
+                    {v.categoryLabel}
+                  </div>
+                  <div className="mt-1 truncate text-sm font-semibold">{v.title}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ======= 图片作品瀑布流（主内容区 · 不包含视频） ======= */}      <div className="flex w-full" style={{ gap: `${GUTTER}px` }}>
         {columnsArray.map((col, colIdx) => (
           <div
             key={colIdx}
