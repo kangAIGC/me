@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-/** GitHub Pages 子路径前缀（静态导出时注入） */
-const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+/** TOS 对象存储直链基址（公开读 + immutable 强缓存，全部图片走 TOS 加载） */
+const TOS = 'https://demovideo.tos-cn-shanghai.volces.com/portfolio';
 
 const GUTTER = 5; // 作品分隔缝（列间/列内卡片间全局统一），旧 16 → 8 → 5，更紧凑但仍保留区分度
 const PAGE_PAD_X = 12; // 外层水平 padding (px)，旧 px-4 (=16) → 12 收缩
@@ -20,6 +20,9 @@ const BREAKPOINTS: { minWidth: number; columns: number }[] = [
 
 const MAX_H = 600;
 const MIN_H = 200;
+
+/** 内容分类：manju=漫剧 / ecom=电商 / arch=建筑（图片），视频统一归 VIDEO_LABEL */
+type CatKey = 'manju' | 'ecom' | 'arch';
 
 /** 分类标签严格三分法：图片按源文件夹（电商/漫剧），视频统一为"视频" */
 const CAT_LABEL: Record<CatKey, string> = {
@@ -51,16 +54,16 @@ function clampedHeight(ratio: number, colWidth: number) {
 /* ---------- 数据源（34 项：30 图 + 4 视频） ---------- */
 
 const IMAGE_ITEMS: MediaItem[] = [
-  // 漫剧(8) → 标签"漫剧"
+  // 漫剧(8) → 标签"漫剧"（key 与上传脚本 NAME_MAP 一一对应，中文文件名已映射为安全英文命名）
   ...[
-    ['青云大殿.png', '青云大殿'],
-    ['诛仙台.png', '诛仙台'],
-    ['萧珩.png', '萧珩'],
-    ['苏挽.png', '苏挽'],
-    ['墨断剑红绳.png', '墨断剑与红绳'],
-    ['灭门旧夜.png', '灭门旧夜'],
-    ['玄青上人.png', '玄青上人'],
-    ['墨玉牌.png', '墨玉牌'],
+    ['qingyun-dadian.png', '青云大殿'],
+    ['zhuxiantai.png', '诛仙台'],
+    ['xiaoheng.png', '萧珩'],
+    ['suwan.png', '苏挽'],
+    ['moduanjian-hongsheng.png', '墨断剑与红绳'],
+    ['miemen-jiuye.png', '灭门旧夜'],
+    ['xuanqing-shangren.png', '玄青上人'],
+    ['moyupai.png', '墨玉牌'],
   ].map<MediaItem>(([file, title]) => ({
     id: `manju-img-${file}`,
     kind: 'image',
@@ -68,7 +71,7 @@ const IMAGE_ITEMS: MediaItem[] = [
     categoryLabel: CAT_LABEL.manju,
     title,
     description: title,
-    src: `${BASE}/漫剧/${encodeURIComponent(file)}`,
+    src: `${TOS}/manju/${file}`,
   })),
 
   // 电商(6) → 标签"电商"
@@ -79,7 +82,7 @@ const IMAGE_ITEMS: MediaItem[] = [
     categoryLabel: CAT_LABEL.ecom,
     title: `电商作品 ${n}`,
     description: `电商作品 ${n}`,
-    src: `${BASE}/电商/${n}.png`,
+    src: `${TOS}/ecom/${n}.png`,
   })),
 
   // 建筑(16): 1-8 png, 9-16 jpeg → 标签"电商"
@@ -90,7 +93,7 @@ const IMAGE_ITEMS: MediaItem[] = [
     categoryLabel: CAT_LABEL.arch,
     title: `建筑作品 ${n}`,
     description: `建筑作品 ${n}`,
-    src: `${BASE}/建筑/${n}.png`,
+    src: `${TOS}/arch/${n}.png`,
   })),
   ...Array.from({ length: 8 }, (_, i) => i + 9).map<MediaItem>((n) => ({
     id: `arch-img-${n}-jpeg`,
@@ -99,7 +102,7 @@ const IMAGE_ITEMS: MediaItem[] = [
     categoryLabel: CAT_LABEL.arch,
     title: `建筑作品 ${n}`,
     description: `建筑作品 ${n}`,
-    src: `${BASE}/建筑/${n}.jpeg`,
+    src: `${TOS}/arch/${n}.jpeg`,
   })),
 ];
 
