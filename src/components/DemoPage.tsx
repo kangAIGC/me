@@ -12,11 +12,10 @@ const AGORA_VIDEOS = {
   'V1.0': 'https://demovideo.tos-cn-shanghai.volces.com/demo.mp4',
 };
 
-// KnowFlow 按版本区分视频（V2.0/V1.0 暂用 V3.0 视频占位，待用户提供链接后替换）
+// KnowFlow 按版本区分视频（V1.0 为早期版本，V2.0 为最新版）
 const KNOWFLOW_VIDEOS = {
-  'V3.0': 'https://demovideo.tos-cn-shanghai.volces.com/%E8%A7%86%E9%A2%91.mp4',
-  'V2.0': 'https://demovideo.tos-cn-shanghai.volces.com/%E8%A7%86%E9%A2%91.mp4', // TODO: 替换为 KnowFlow V2.0 视频链接
-  'V1.0': 'https://demovideo.tos-cn-shanghai.volces.com/%E8%A7%86%E9%A2%91.mp4', // TODO: 替换为 KnowFlow V1.0 视频链接
+  'V2.0': 'https://demovideo.tos-cn-shanghai.volces.com/KnowFlow%20v2.mp4',
+  'V1.0': 'https://demovideo.tos-cn-shanghai.volces.com/%E8%A7%86%E9%A2%91.mp4',
 };
 
 // Agora.ai 按版本区分封面（V2.0 用 ADA封面.png，V1.0 用 ArchDA封面.png）
@@ -26,19 +25,24 @@ const AGORA_THUMBNAILS = {
   'V1.0': `${BASE}/ArchDA封面.png`,
 };
 
-// KnowFlow 按版本区分封面（V2.0/V1.0 暂沿用现有封面，待用户提供后替换）
+// KnowFlow 按版本区分封面（暂沿用现有封面，待用户提供后替换）
 const KNOWFLOW_THUMBNAILS = {
-  'V3.0': `${BASE}/封面.png`,
   'V2.0': `${BASE}/封面.png`, // TODO: 替换为 KnowFlow V2.0 封面
   'V1.0': `${BASE}/封面.png`, // TODO: 替换为 KnowFlow V1.0 封面
 };
 
 export function DemoPage() {
   const [activeProduct, setActiveProduct] = useState<'Agora.ai' | 'KnowFlow'>('Agora.ai');
-  const [version, setVersion] = useState<'V3.0' | 'V2.0' | 'V1.0'>('V3.0');
+  const [agoraVersion, setAgoraVersion] = useState<'V3.0' | 'V2.0' | 'V1.0'>('V3.0');
+  const [knowflowVersion, setKnowflowVersion] = useState<'V2.0' | 'V1.0'>('V2.0');
 
-  const videoSrc = activeProduct === 'Agora.ai' ? AGORA_VIDEOS[version] : KNOWFLOW_VIDEOS[version];
-  const poster = activeProduct === 'Agora.ai' ? AGORA_THUMBNAILS[version] : KNOWFLOW_THUMBNAILS[version];
+  const version = activeProduct === 'Agora.ai' ? agoraVersion : knowflowVersion;
+  const videoSrc =
+    activeProduct === 'Agora.ai' ? AGORA_VIDEOS[agoraVersion] : KNOWFLOW_VIDEOS[knowflowVersion];
+  const poster =
+    activeProduct === 'Agora.ai'
+      ? AGORA_THUMBNAILS[agoraVersion]
+      : KNOWFLOW_THUMBNAILS[knowflowVersion];
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -68,25 +72,47 @@ export function DemoPage() {
           </button>
         </div>
 
-        {/* 版本切换按钮（Agora.ai / KnowFlow 均为 V3.0/V2.0/V1.0 三档，与产品按钮等宽上下对齐） */}
+        {/* 版本切换按钮：始终显示在当前所选产品按钮的正下方（Agora.ai 在左半，KnowFlow 在右半） */}
         <div className="shrink-0 flex gap-2 pb-1 w-full">
-          <div className="flex-1 flex gap-2">
-            {(['V3.0', 'V2.0', 'V1.0'] as const).map((v) => (
-              <button
-                key={v}
-                onClick={() => setVersion(v)}
-                className={`flex-1 rounded px-3 py-1 text-xs font-medium transition-all ${
-                  version === v
-                    ? 'bg-[#333333] text-white shadow-sm'
-                    : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F5F5F5]'
-                }`}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
-          {/* 右侧占位，与 KnowFlow 按钮位置对称 */}
-          <div className="flex-1" />
+          {activeProduct === 'Agora.ai' ? (
+            <>
+              <div className="flex-1 flex gap-2">
+                {(['V3.0', 'V2.0', 'V1.0'] as const).map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => setAgoraVersion(v)}
+                    className={`flex-1 rounded px-3 py-1 text-xs font-medium transition-all ${
+                      agoraVersion === v
+                        ? 'bg-[#333333] text-white shadow-sm'
+                        : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F5F5F5]'
+                    }`}
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+              <div className="flex-1" />
+            </>
+          ) : (
+            <>
+              <div className="flex-1" />
+              <div className="flex-1 flex gap-2">
+                {(['V2.0', 'V1.0'] as const).map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => setKnowflowVersion(v)}
+                    className={`flex-1 rounded px-3 py-1 text-xs font-medium transition-all ${
+                      knowflowVersion === v
+                        ? 'bg-[#333333] text-white shadow-sm'
+                        : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F5F5F5]'
+                    }`}
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Video Display Area */}
