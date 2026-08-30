@@ -2,9 +2,11 @@
 
 import { Navbar } from "@/components/Navbar";
 
-export default function ResumePage() {
-  const feishuUrl = "https://vcnxjdphn663.feishu.cn/wiki/UW64wtICdijbdgkpaeocPeIZnpe?hideTopBar=true";
+/** GitHub Pages 子路径前缀（静态导出时注入） */
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const PDF_URL = `${BASE}/简历.pdf`;
 
+export default function ResumePage() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
       {/* 顶部导航栏 */}
@@ -12,24 +14,32 @@ export default function ResumePage() {
 
       {/* 内容区域 */}
       <div className="flex flex-1 flex-col">
-        {/* 飞书文档区域 */}
-        <div className="flex-1 flex flex-col min-h-0 w-full max-w-7xl mx-auto px-4">
-          <div className="flex-1 flex flex-col min-h-0 w-full overflow-hidden relative">
-            <div
-              className="absolute inset-0"
-              style={{ marginTop: "-56px" }}
-            >
-              <iframe
-                src={feishuUrl}
-                className="w-full h-full border-0"
-                style={{
-                  width: "calc(100% + 0px)",
-                  height: "calc(100% + 56px)",
-                }}
-                title="Resume"
-                allow="clipboard-read; clipboard-write"
-              />
+        <div className="flex flex-1 flex-col min-h-0 w-full max-w-7xl mx-auto px-4 py-2 gap-2">
+          {/* 说明工具条：文件信息 + 查看方式提示 + 新窗口打开按钮 */}
+          <div className="flex shrink-0 items-center justify-between gap-3 rounded border border-[#E5E5E5] bg-[#FAFAFA] px-3 py-2">
+            <div className="min-w-0">
+              <div className="text-sm font-medium text-[#333333]">简历.pdf</div>
+              <div className="text-xs text-[#666666]">
+                简历已内嵌显示，可直接滚动查看；如未正常显示，请点击右侧按钮在新标签页打开
+              </div>
             </div>
+            <a
+              href={PDF_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 rounded bg-[#333333] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-black"
+            >
+              新窗口打开
+            </a>
+          </div>
+
+          {/* PDF 预览区域 */}
+          <div className="flex-1 min-h-0">
+            <iframe
+              src={PDF_URL}
+              className="h-full w-full rounded border border-[#E5E5E5]"
+              title="简历.pdf"
+            />
           </div>
         </div>
       </div>

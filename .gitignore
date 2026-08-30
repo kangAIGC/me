@@ -78,6 +78,8 @@ logs/
 
 # 文档类也默认加入
 *.pdf
+# 简历 PDF 需随站点部署，加入白名单
+!public/*.pdf
 *.docx
 *.doc
 *.xlsx
