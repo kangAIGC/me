@@ -15,7 +15,7 @@ const AGORA_VIDEOS = {
 // KnowFlow 按版本区分视频（V1.0 为早期版本，V2.0 为最新版）
 const KNOWFLOW_VIDEOS = {
   'V2.0': 'https://demovideo.tos-cn-shanghai.volces.com/KnowFlow%20v2.mp4',
-  'V1.0': 'https://demovideo.tos-cn-shanghai.volces.com/%E8%A7%86%E9%A2%91.mp4',
+  'V1.0': 'https://demovideo.tos-cn-shanghai.volces.com/demo-ASA.mp4',
 };
 
 // Agora.ai 按版本区分封面（V2.0 用 ADA封面.png，V1.0 用 ArchDA封面.png）
