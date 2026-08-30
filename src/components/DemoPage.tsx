@@ -25,9 +25,9 @@ const AGORA_THUMBNAILS = {
   'V1.0': `${BASE}/ArchDA封面.png`,
 };
 
-// KnowFlow 按版本区分封面（V2.0 暂沿用现有封面，待用户提供后替换）
+// KnowFlow 按版本区分封面
 const KNOWFLOW_THUMBNAILS = {
-  'V2.0': `${BASE}/封面.png`, // TODO: 替换为 KnowFlow V2.0 封面
+  'V2.0': `${BASE}/1.png`,
   'V1.0': `${BASE}/封面2.png`,
 };
 
