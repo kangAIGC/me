@@ -14,24 +14,6 @@ export default function ResumePage() {
 
       {/* 内容区域：全宽铺满，无外边距 */}
       <div className="flex w-full flex-1 flex-col min-h-0">
-        {/* 查看提示条：单行紧凑，仅保留必要指引 */}
-        <div className="flex shrink-0 w-full items-center justify-between gap-3 bg-[#FAFAFA] px-3 py-1.5">
-          <div className="flex min-w-0 items-center gap-2">
-            <span className="shrink-0 text-xs font-medium text-[#333333]">简历.pdf</span>
-            <span className="truncate text-xs text-[#666666]">
-              可直接滚动查看；如未正常显示，点击右侧按钮在新标签页打开
-            </span>
-          </div>
-          <a
-            href={PDF_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 rounded bg-[#333333] px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-black"
-          >
-            新窗口打开
-          </a>
-        </div>
-
         {/* PDF 预览区域：占满剩余全部空间，无边框无圆角 */}
         <div className="relative flex-1 min-h-0 w-full">
           <iframe
