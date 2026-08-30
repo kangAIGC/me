@@ -41,15 +41,6 @@ export default function ResumePage() {
           />
         </div>
       </div>
-
-      {/* 底部作者信息：压缩为单行 */}
-      <footer className="shrink-0 border-t border-[#E5E5E5] py-1.5">
-        <div className="flex w-full flex-wrap items-center justify-center gap-x-4 px-4 text-xs text-[#666666]">
-          <span>徐文康</span>
-          <span>tel: 18795907388</span>
-          <span>mail: 2668087983@qq.com</span>
-        </div>
-      </footer>
     </div>
   );
 }
