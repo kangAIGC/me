@@ -12,8 +12,11 @@ const AGORA_VIDEOS = {
   'V1.0': 'https://demovideo.tos-cn-shanghai.volces.com/demo.mp4',
 };
 
-const PRODUCT_VIDEOS = {
-  KnowFlow: 'https://demovideo.tos-cn-shanghai.volces.com/%E8%A7%86%E9%A2%91.mp4',
+// KnowFlow 按版本区分视频（V2.0/V1.0 暂用 V3.0 视频占位，待用户提供链接后替换）
+const KNOWFLOW_VIDEOS = {
+  'V3.0': 'https://demovideo.tos-cn-shanghai.volces.com/%E8%A7%86%E9%A2%91.mp4',
+  'V2.0': 'https://demovideo.tos-cn-shanghai.volces.com/%E8%A7%86%E9%A2%91.mp4', // TODO: 替换为 KnowFlow V2.0 视频链接
+  'V1.0': 'https://demovideo.tos-cn-shanghai.volces.com/%E8%A7%86%E9%A2%91.mp4', // TODO: 替换为 KnowFlow V1.0 视频链接
 };
 
 // Agora.ai 按版本区分封面（V2.0 用 ADA封面.png，V1.0 用 ArchDA封面.png）
@@ -23,16 +26,19 @@ const AGORA_THUMBNAILS = {
   'V1.0': `${BASE}/ArchDA封面.png`,
 };
 
-const PRODUCT_THUMBNAILS = {
-  KnowFlow: `${BASE}/封面.png`,
+// KnowFlow 按版本区分封面（V2.0/V1.0 暂沿用现有封面，待用户提供后替换）
+const KNOWFLOW_THUMBNAILS = {
+  'V3.0': `${BASE}/封面.png`,
+  'V2.0': `${BASE}/封面.png`, // TODO: 替换为 KnowFlow V2.0 封面
+  'V1.0': `${BASE}/封面.png`, // TODO: 替换为 KnowFlow V1.0 封面
 };
 
 export function DemoPage() {
   const [activeProduct, setActiveProduct] = useState<'Agora.ai' | 'KnowFlow'>('Agora.ai');
-  const [agoraVersion, setAgoraVersion] = useState<'V3.0' | 'V2.0' | 'V1.0'>('V3.0');
+  const [version, setVersion] = useState<'V3.0' | 'V2.0' | 'V1.0'>('V3.0');
 
-  const videoSrc = activeProduct === 'Agora.ai' ? AGORA_VIDEOS[agoraVersion] : PRODUCT_VIDEOS.KnowFlow;
-  const poster = activeProduct === 'Agora.ai' ? AGORA_THUMBNAILS[agoraVersion] : PRODUCT_THUMBNAILS.KnowFlow;
+  const videoSrc = activeProduct === 'Agora.ai' ? AGORA_VIDEOS[version] : KNOWFLOW_VIDEOS[version];
+  const poster = activeProduct === 'Agora.ai' ? AGORA_THUMBNAILS[version] : KNOWFLOW_THUMBNAILS[version];
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -62,35 +68,33 @@ export function DemoPage() {
           </button>
         </div>
 
-        {/* Agora.ai 版本切换按钮（与 Agora.ai 按钮等宽，上下对齐） */}
-        {activeProduct === 'Agora.ai' && (
-          <div className="shrink-0 flex gap-2 pb-1 w-full">
-            <div className="flex-1 flex gap-2">
-              {(['V3.0', 'V2.0', 'V1.0'] as const).map((v) => (
-                <button
-                  key={v}
-                  onClick={() => setAgoraVersion(v)}
-                  className={`flex-1 rounded px-3 py-1 text-xs font-medium transition-all ${
-                    agoraVersion === v
-                      ? 'bg-[#333333] text-white shadow-sm'
-                      : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F5F5F5]'
-                  }`}
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
-            {/* 右侧占位，与 KnowFlow 按钮位置对称 */}
-            <div className="flex-1" />
+        {/* 版本切换按钮（Agora.ai / KnowFlow 均为 V3.0/V2.0/V1.0 三档，与产品按钮等宽上下对齐） */}
+        <div className="shrink-0 flex gap-2 pb-1 w-full">
+          <div className="flex-1 flex gap-2">
+            {(['V3.0', 'V2.0', 'V1.0'] as const).map((v) => (
+              <button
+                key={v}
+                onClick={() => setVersion(v)}
+                className={`flex-1 rounded px-3 py-1 text-xs font-medium transition-all ${
+                  version === v
+                    ? 'bg-[#333333] text-white shadow-sm'
+                    : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F5F5F5]'
+                }`}
+              >
+                {v}
+              </button>
+            ))}
           </div>
-        )}
+          {/* 右侧占位，与 KnowFlow 按钮位置对称 */}
+          <div className="flex-1" />
+        </div>
 
         {/* Video Display Area */}
         <div className="flex-1 flex items-center justify-center py-2 w-full">
           <div className="w-full">
             <div className="relative w-full aspect-video overflow-hidden rounded-lg bg-[#F5F5F5]" style={{ minHeight: '350px' }}>
               <video
-                key={`${activeProduct}-${activeProduct === 'Agora.ai' ? agoraVersion : ''}`}
+                key={`${activeProduct}-${version}`}
                 src={videoSrc}
                 poster={poster}
                 controls
