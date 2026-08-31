@@ -2,33 +2,33 @@
 
 import { useState } from 'react';
 
-// 静态导出时由 basePath 注入子路径前缀（GitHub Pages 部署在 /<repo>/ 下）
-const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+/** TOS 对象存储直链基址（全部视频与封面图均走 TOS CDN 加载） */
+const TOS = 'https://demovideo.tos-cn-shanghai.volces.com';
 
 // Agora.ai 按版本区分视频
 const AGORA_VIDEOS = {
-  'V3.0': 'https://demovideo.tos-cn-shanghai.volces.com/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91.mp4',
-  'V2.0': 'https://demovideo.tos-cn-shanghai.volces.com/demo-ADA(%E5%8E%8B%E7%BC%A9%EF%BC%89.mp4',
-  'V1.0': 'https://demovideo.tos-cn-shanghai.volces.com/demo.mp4',
+  'V3.0': `${TOS}/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91.mp4`,
+  'V2.0': `${TOS}/demo-ADA(%E5%8E%8B%E7%BC%A9%EF%BC%89.mp4`,
+  'V1.0': `${TOS}/demo.mp4`,
 };
 
 // KnowFlow 按版本区分视频（V1.0 为早期版本，V2.0 为最新版）
 const KNOWFLOW_VIDEOS = {
-  'V2.0': 'https://demovideo.tos-cn-shanghai.volces.com/KnowFlow%20v2.mp4',
-  'V1.0': 'https://demovideo.tos-cn-shanghai.volces.com/demo-ASA.mp4',
+  'V2.0': `${TOS}/KnowFlow%20v2.mp4`,
+  'V1.0': `${TOS}/demo-ASA.mp4`,
 };
 
-// Agora.ai 按版本区分封面（V2.0 用 ADA封面.png，V1.0 用 ArchDA封面.png）
+// Agora.ai 按版本区分封面（V2.0 用 ADA封面，V1.0 用 ArchDA封面）
 const AGORA_THUMBNAILS = {
-  'V3.0': `${BASE}/agora封面.png`,
-  'V2.0': `${BASE}/ADA封面.png`,
-  'V1.0': `${BASE}/ArchDA封面.png`,
+  'V3.0': `${TOS}/site-media/agora-cover.png`,
+  'V2.0': `${TOS}/site-media/ada-cover.png`,
+  'V1.0': `${TOS}/site-media/archda-cover.png`,
 };
 
 // KnowFlow 按版本区分封面
 const KNOWFLOW_THUMBNAILS = {
-  'V2.0': `${BASE}/1.png`,
-  'V1.0': `${BASE}/封面2.png`,
+  'V2.0': `${TOS}/site-media/knowflow-v2-cover.png`,
+  'V1.0': `${TOS}/site-media/knowflow-v1-cover.png`,
 };
 
 export function DemoPage() {

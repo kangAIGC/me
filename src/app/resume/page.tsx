@@ -2,10 +2,8 @@
 
 import { Navbar } from "@/components/Navbar";
 
-/** GitHub Pages 子路径前缀（静态导出时注入） */
-const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-/** 简历长图（中文与全角括号需 URL 编码，保证静态部署后可访问） */
-const RESUME_IMG = `${BASE}/${encodeURIComponent("简历（正式版）.jpg")}`;
+/** 简历长图（TOS 直链：CDN 加速 + 1 年强缓存，替代原 GitHub Pages 慢加载） */
+const RESUME_IMG = 'https://demovideo.tos-cn-shanghai.volces.com/site-media/resume.jpg';
 
 export default function ResumePage() {
   return (
