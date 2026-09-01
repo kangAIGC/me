@@ -49,7 +49,7 @@ export function Navbar() {
                 : 'text-[#666666] hover:bg-[#F5F5F5] hover:text-[#1A1A1A]'
             }`}
           >
-            Portfolio作品
+            Aigc作品
           </Link>
           <Link
             href="/prd"
