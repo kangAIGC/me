@@ -2,8 +2,8 @@
 
 import { Navbar } from "@/components/Navbar";
 
-/** 简历长图（TOS 直链：CDN 加速 + 1 年强缓存，替代原 GitHub Pages 慢加载） */
-const RESUME_IMG = 'https://demovideo.tos-cn-shanghai.volces.com/site-media/resume.jpg';
+/** 简历长图（TOS 直链：CDN 加速 + 1 年强缓存；文件更新时递增版本号以绕过缓存） */
+const RESUME_IMG = 'https://demovideo.tos-cn-shanghai.volces.com/site-media/resume-v2.jpg';
 
 export default function ResumePage() {
   return (

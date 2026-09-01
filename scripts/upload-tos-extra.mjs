@@ -37,7 +37,7 @@ const FILES = [
   ['1.png', 'site-media/knowflow-v2-cover.png', 'image/png'],
   ['封面2.png', 'site-media/knowflow-v1-cover.png', 'image/png'],
   ['1.jpg', 'site-media/logo.jpg', 'image/jpeg'],
-  ['简历（正式版）.jpg', 'site-media/resume.jpg', 'image/jpeg'],
+  ['简历（正式版）.jpg', 'site-media/resume-v2.jpg', 'image/jpeg'],
 ];
 
 async function uploadOne(job, attempt = 1) {
