@@ -36,7 +36,7 @@ export function Navbar() {
                 : 'text-[#666666] hover:bg-[#F5F5F5] hover:text-[#1A1A1A]'
             }`}
           >
-            Demo演示
+            原型设计
           </Link>
           <Link
             href="/portfolio"
