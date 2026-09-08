@@ -8,12 +8,8 @@ export function Navbar() {
   const pathname = usePathname();
   // 归一化：去掉末尾 '/' 再比较，兼容路由两种情况
   const normalized = pathname?.replace(/\/+$/, '') ?? '';
-  const [activeTab, setActiveTab] = useState<'demo' | 'portfolio' | 'resume'>(
-    normalized === '/portfolio'
-      ? 'portfolio'
-      : normalized === '/resume'
-        ? 'resume'
-        : 'demo'
+  const [activeTab, setActiveTab] = useState<'demo' | 'portfolio'>(
+    normalized === '/portfolio' ? 'portfolio' : 'demo'
   );
 
   return (
@@ -48,17 +44,6 @@ export function Navbar() {
             }`}
           >
             Aigc作品
-          </Link>
-          <Link
-            href="/resume"
-            onClick={() => setActiveTab('resume')}
-            className={`rounded px-4 py-2 text-sm font-medium transition-colors ${
-              activeTab === 'resume'
-                ? 'bg-[#333333] text-white'
-                : 'text-[#666666] hover:bg-[#F5F5F5] hover:text-[#1A1A1A]'
-            }`}
-          >
-            Resume简历
           </Link>
         </div>
       </div>

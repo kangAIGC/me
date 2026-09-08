@@ -5,44 +5,19 @@ import { useState } from 'react';
 /** TOS 对象存储直链基址（全部视频与封面图均走 TOS CDN 加载） */
 const TOS = 'https://demovideo.tos-cn-shanghai.volces.com';
 
-// Agora.ai 按版本区分视频
-const AGORA_VIDEOS = {
-  'V3.0': `${TOS}/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91.mp4`,
-  'V2.0': `${TOS}/demo-ADA(%E5%8E%8B%E7%BC%A9%EF%BC%89.mp4`,
-  'V1.0': `${TOS}/demo.mp4`,
-};
+// Agora.ai 视频与封面
+const AGORA_VIDEO = `${TOS}/%E6%BC%94%E7%A4%BA%E8%A7%86%E9%A2%91.mp4`;
+const AGORA_THUMBNAIL = `${TOS}/site-media/agora-cover.png`;
 
-// KnowFlow 按版本区分视频（V1.0 为早期版本，V2.0 为最新版）
-const KNOWFLOW_VIDEOS = {
-  'V2.0': `${TOS}/KnowFlow%20v2.mp4`,
-  'V1.0': `${TOS}/demo-ASA.mp4`,
-};
-
-// Agora.ai 按版本区分封面（V2.0 用 ADA封面，V1.0 用 ArchDA封面）
-const AGORA_THUMBNAILS = {
-  'V3.0': `${TOS}/site-media/agora-cover.png`,
-  'V2.0': `${TOS}/site-media/ada-cover.png`,
-  'V1.0': `${TOS}/site-media/archda-cover.png`,
-};
-
-// KnowFlow 按版本区分封面
-const KNOWFLOW_THUMBNAILS = {
-  'V2.0': `${TOS}/site-media/knowflow-v2-cover.png`,
-  'V1.0': `${TOS}/site-media/knowflow-v1-cover.png`,
-};
+// KnowFlow 视频与封面
+const KNOWFLOW_VIDEO = `${TOS}/KnowFlow%20v2.mp4`;
+const KNOWFLOW_THUMBNAIL = `${TOS}/site-media/knowflow-v2-cover.png`;
 
 export function DemoPage() {
   const [activeProduct, setActiveProduct] = useState<'Agora.ai' | 'KnowFlow'>('Agora.ai');
-  const [agoraVersion, setAgoraVersion] = useState<'V3.0' | 'V2.0' | 'V1.0'>('V3.0');
-  const [knowflowVersion, setKnowflowVersion] = useState<'V2.0' | 'V1.0'>('V2.0');
 
-  const version = activeProduct === 'Agora.ai' ? agoraVersion : knowflowVersion;
-  const videoSrc =
-    activeProduct === 'Agora.ai' ? AGORA_VIDEOS[agoraVersion] : KNOWFLOW_VIDEOS[knowflowVersion];
-  const poster =
-    activeProduct === 'Agora.ai'
-      ? AGORA_THUMBNAILS[agoraVersion]
-      : KNOWFLOW_THUMBNAILS[knowflowVersion];
+  const videoSrc = activeProduct === 'Agora.ai' ? AGORA_VIDEO : KNOWFLOW_VIDEO;
+  const poster = activeProduct === 'Agora.ai' ? AGORA_THUMBNAIL : KNOWFLOW_THUMBNAIL;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -58,7 +33,7 @@ export function DemoPage() {
                 : 'bg-white text-[#1A1A1A] border border-[#E5E5E5] hover:bg-[#F5F5F5]'
             }`}
           >
-            Agora.ai
+            项目一
           </button>
           <button
             onClick={() => setActiveProduct('KnowFlow')}
@@ -68,51 +43,8 @@ export function DemoPage() {
                 : 'bg-white text-[#1A1A1A] border border-[#E5E5E5] hover:bg-[#F5F5F5]'
             }`}
           >
-            KnowFlow
+            项目二
           </button>
-        </div>
-
-        {/* 版本切换按钮：始终显示在当前所选产品按钮的正下方（Agora.ai 在左半，KnowFlow 在右半） */}
-        <div className="shrink-0 flex gap-2 pb-1 w-full">
-          {activeProduct === 'Agora.ai' ? (
-            <>
-              <div className="flex-1 flex gap-2">
-                {(['V3.0', 'V2.0', 'V1.0'] as const).map((v) => (
-                  <button
-                    key={v}
-                    onClick={() => setAgoraVersion(v)}
-                    className={`flex-1 rounded px-3 py-1 text-xs font-medium transition-all ${
-                      agoraVersion === v
-                        ? 'bg-[#333333] text-white shadow-sm'
-                        : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F5F5F5]'
-                    }`}
-                  >
-                    {v}
-                  </button>
-                ))}
-              </div>
-              <div className="flex-1" />
-            </>
-          ) : (
-            <>
-              <div className="flex-1" />
-              <div className="flex-1 flex gap-2">
-                {(['V2.0', 'V1.0'] as const).map((v) => (
-                  <button
-                    key={v}
-                    onClick={() => setKnowflowVersion(v)}
-                    className={`flex-1 rounded px-3 py-1 text-xs font-medium transition-all ${
-                      knowflowVersion === v
-                        ? 'bg-[#333333] text-white shadow-sm'
-                        : 'bg-white text-[#666666] border border-[#E5E5E5] hover:bg-[#F5F5F5]'
-                    }`}
-                  >
-                    {v}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
         </div>
 
         {/* Video Display Area */}
@@ -120,7 +52,7 @@ export function DemoPage() {
           <div className="w-full">
             <div className="relative w-full aspect-video overflow-hidden rounded-lg bg-[#F5F5F5]" style={{ minHeight: '350px' }}>
               <video
-                key={`${activeProduct}-${version}`}
+                key={activeProduct}
                 src={videoSrc}
                 poster={poster}
                 controls
